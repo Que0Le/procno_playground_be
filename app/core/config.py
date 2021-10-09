@@ -2,7 +2,7 @@ import secrets
 from typing import Any, Dict, List, Optional, Union
 
 from pydantic import AnyHttpUrl, BaseSettings, EmailStr, HttpUrl, PostgresDsn, validator
-
+from enum import Enum
 
 class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
@@ -79,11 +79,17 @@ class Settings(BaseSettings):
 
     EMAIL_TEST_USER: EmailStr = "test@example.com"  # type: ignore
     FIRST_SUPERUSER: EmailStr
+    FIRST_SUPERUSER_NAME: str
     FIRST_SUPERUSER_PASSWORD: str
     USERS_OPEN_REGISTRATION: bool = False
 
     class Config:
         case_sensitive = True
+        env_file = ".env"
 
 
 settings = Settings()
+
+class Roles(Enum):
+    ADMIN = "admin",
+    MEMBER = "member"

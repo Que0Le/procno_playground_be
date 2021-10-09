@@ -3,3 +3,6 @@
 htmlcov
 __pycache__
 app.egg-info
+.env
+test.py
+

@@ -8,12 +8,11 @@ from app.db.base_class import Base
 if TYPE_CHECKING:
     from .item import Item  # noqa: F401
 
-
-class User(Base):
+class UserDB(Base):
     id = Column(Integer, primary_key=True, index=True)
-    full_name = Column(String, index=True)
+    username = Column(String, index=True)
     email = Column(String, unique=True, index=True, nullable=False)
+    salt = Column(String, nullable=False)
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean(), default=True)
-    is_superuser = Column(Boolean(), default=False)
-    items = relationship("Item", back_populates="owner")
+    bio = Column(String, nullable=True, default='')
