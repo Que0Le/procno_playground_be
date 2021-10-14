@@ -36,3 +36,8 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 def get_password_hash(password: str) -> str:
     # Password should be "salt+password"
     return pwd_context.hash(password)
+
+# TODO: create logout function
+# The token is saved client side, therefore server can not log the user out by
+# deleting token. Instead, server can maintain a blacklist of token that is
+# considered "not valid". But how to know which token belongs to a user?

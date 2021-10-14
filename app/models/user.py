@@ -9,6 +9,9 @@ if TYPE_CHECKING:
     from .item import Item  # noqa: F401
 
 class UserDB(Base):
+    # overwrite the tabble name, otherwise sqlalchemy will assume "userdb"
+    __tablename__  = 'users'
+
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, index=True)
     email = Column(String, unique=True, index=True, nullable=False)
@@ -16,3 +19,4 @@ class UserDB(Base):
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean(), default=True)
     bio = Column(String, nullable=True, default='')
+    # TODO: datetime
