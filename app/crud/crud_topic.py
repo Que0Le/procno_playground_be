@@ -8,17 +8,32 @@ from app.schemas.topic import TopicBase, TopicCreate, TopicUpdate, TopicInDBBase
 
 
 class CRUDTopic(CRUDBase[TopicDB, TopicCreate, TopicUpdate]):
-    def get_one_by_topic_title(
+    def get_all_by_topic_title(
         self, db: Session, *, title: str, skip=0, limit=100
     ) -> Optional[TopicDB]:
         return (
             db.query(TopicDB)
-            .filter(TopicDB.title == title)            
+            .filter(TopicDB.title == title)
             .offset(skip)
-            .limit(limit)
+            .limit(limit)        
+            .first()
+        )
+    def get_one_by_topic_title(
+        self, db: Session, *, title: str
+    ) -> Optional[TopicDB]:
+        return (
+            db.query(TopicDB)
+            .filter(TopicDB.title == title)            
             .all()
         )
-
+    def get_one_by_topic_id(
+        self, db: Session, *, id: int
+    ) -> Optional[TopicDB]:
+        return (
+            db.query(TopicDB)
+            .filter(TopicDB.id == id)            
+            .first()
+        )
     # def create(self, db: Session, *, obj_in: UserCreate) -> UserDB:
     #     salt = generate_salt()
     #     db_obj = UserDB(
