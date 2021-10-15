@@ -42,6 +42,8 @@ def test_any(
     """
     Test anything.
     """
-    print(crud.tag_topic.get_topic_ids_by_tag_id(db=db, tag_id=10))
+    print(crud.topic.get_one_by_topic_title(
+        db=db, title="Fundamental tangible concept"
+    )[0].to_string())
 
     return {"msg": "Test request sent"}

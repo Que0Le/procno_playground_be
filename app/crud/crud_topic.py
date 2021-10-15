@@ -1,16 +1,23 @@
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional, Union, List
 
 from sqlalchemy.orm import Session
 
-from app.core.security import generate_salt, get_password_hash, verify_password
 from app.crud.base import CRUDBase
-from app.models.tag import TagDB
-from app.schemas.tag import TagCreate, TagInDBBase, TagUpdate
+from app.models.topic import TopicDB
+from app.schemas.topic import TopicBase, TopicCreate, TopicUpdate, TopicInDBBase
 
 
-class CRUDTag(CRUDBase[TagDB, TagCreate, TagUpdate]):
-    def get_by_tag_name(self, db: Session, *, tag_name: str) -> Optional[TagDB]:
-        return db.query(TagDB).filter(TagDB.tag_name == tag_name).first()
+class CRUDTopic(CRUDBase[TopicDB, TopicCreate, TopicUpdate]):
+    def get_one_by_topic_title(
+        self, db: Session, *, title: str, skip=0, limit=100
+    ) -> Optional[TopicDB]:
+        return (
+            db.query(TopicDB)
+            .filter(TopicDB.title == title)            
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
 
     # def create(self, db: Session, *, obj_in: UserCreate) -> UserDB:
     #     salt = generate_salt()
@@ -27,7 +34,7 @@ class CRUDTag(CRUDBase[TagDB, TagCreate, TagUpdate]):
     #     # TODO: set role for user in DB
 
     #     return db_obj
- 
+
     # def update(
     #     self, db: Session, *, db_obj: UserDB, obj_in: Union[UserUpdate, Dict[str, Any]]
     # ) -> UserDB:
@@ -41,4 +48,5 @@ class CRUDTag(CRUDBase[TagDB, TagCreate, TagUpdate]):
     #         update_data["hashed_password"] = hashed_password
     #     return super().update(db, db_obj=db_obj, obj_in=update_data)
 
-tag = CRUDTag(TagDB)
+
+topic = CRUDTopic(TopicDB)

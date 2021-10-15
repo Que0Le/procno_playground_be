@@ -1,7 +1,7 @@
 # from .crud_item import item
 from .crud_user import user
-from .crud_tag import tag
-from .crud_tag_topic import tag_topic
+from .crud_tag_related import tag, tag_topic
+from .crud_topic import topic
 
 # For a new basic set of CRUD operations you could just do
 
