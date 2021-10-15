@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
 from app.models.small_models import TagDB, TagTopicDB
-from app.schemas.tag_related import (
+from app.schemas.s_tag import (
     TagCreate, TagInDBBase, TagUpdate,
     TagTopicCreate, TagTopicUpdate
 )

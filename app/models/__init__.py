@@ -5,3 +5,6 @@ from .small_models import (
     RecordDB,
     RoleDB, UserRoleDB
 )
+from .m_topic import TopicDB, TopicCombiDB
+from .m_answer import AnswerDB, AnswerCombiDB
+from .m_question import QuestionDB, QuestionCombiDB

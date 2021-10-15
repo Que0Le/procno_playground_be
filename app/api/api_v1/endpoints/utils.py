@@ -35,15 +35,15 @@ def test_email(
     send_test_email(email_to=email_to)
     return {"msg": "Test email sent"}
 
-@router.post("/test-any/", response_model=schemas.Msg, status_code=201)
+@router.post("/test-any/", status_code=200)
 def test_any(
     db: Session = Depends(deps.get_db)
 ) -> Any:
     """
     Test anything.
     """
-    print(crud.topic.get_one_by_topic_title(
-        db=db, title="Fundamental tangible concept"
-    )[0].to_string())
-
-    return {"msg": "Test request sent"}
+    # r = crud.answer.get_answers_combi_by_topic_id(db=db, id=1, limit=1)
+    r = crud.topic.get_combi_by_topic_id(db=db, id=1, limit=1)
+    # r = crud.question.get_combi_by_topic_id(db=db, id=1, limit=1)
+    return r
+    # return {"msg": "Test request sent"}
