@@ -43,7 +43,7 @@ def test_any(
     Test anything.
     """
     # r = crud.answer.get_answers_combi_by_topic_id(db=db, id=1, limit=1)
-    r = crud.topic.get_combi_by_topic_id(db=db, id=1, limit=1)
+    r = crud.topic.get_combi_by_topic_id(db=db, id=3, limit=1)
     # r = crud.question.get_combi_by_topic_id(db=db, id=1, limit=1)
     return r
     # return {"msg": "Test request sent"}
