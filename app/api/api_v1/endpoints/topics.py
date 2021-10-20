@@ -13,23 +13,23 @@ from sqlalchemy.orm import Session
 router = APIRouter()
 
 
-# @router.get("/own-topics/", response_model=List[schemas.TopicOverviewGet], status_code=201)
+@router.get("/own-topics/", response_model=List[schemas.TopicOverviewGet], status_code=201)
 @router.get("/own-topics/", status_code=201)
 def get_own_topics(
     db: Session = Depends(deps.get_db),
-    # current_user: models.UserDB = Depends(deps.get_current_user),
+    current_user: models.UserDB = Depends(deps.get_current_user),
 ) -> Any:
     """
     Get topics created by current user
     """
-    # topics = crud.topic.get_combi_by_topic_id(db=db, id=current_user.id)
-    topics = crud.topic.get_combi_by_user_id(db=db, owner_id=278)
-    # r = []
-    # for topic in topics:
-        # temp: TopicOverviewGet
-        # r.append(schemas.TopicOverviewGet(tc=topic))
-        # r.append(temp)
-    return topics
+    topics = crud.topic.get_combi_by_topic_id(db=db, id=current_user.id)
+    # topics = crud.topic.get_combi_by_user_id(db=db, owner_id=278)
+    r = []
+    for topic in topics:
+        temp = schemas.create_topiccombo_from_db_model(topic)
+        if temp:
+            r.append(temp)
+    return r
 
 @router.post("/test-any/", status_code=200)
 def test_any(

@@ -45,39 +45,45 @@ class TopicOverviewGet(BaseModel):
     commentar_created_at: datetime
     commentar_updated_at: datetime
 
-    # def __init__(self, tc: TopicCombiDB = None):
-    #     if tc:
-    #         print(tc.t_uniq_id, tc.q_uniq_id)
-    #         self.topic_id = "str(tc.t_uniq_id)"
-    #         self.topic_title = tc.t_title
-    #         self.topic_created_at = tc.t_created_at
-    #         self.topic_updated_at = tc.t_updated_at
-    #         #
-    #         self.nbr_answer = tc.nbr_answers
-    #         #
-    #         for i in range(0, len(tc.tt_tag_uuids)):
-    #             self.tag_and_ids.append(
-    #                 TagAndID(str(tc.tt_tag_uuids[i]), tc.tt_tags[i])
-    #             )
-    #         #
-    #         self.question_id = str(tc.q_uniq_id)
-    #         self.question_created_at = tc.q_created_at
-    #         self.question_updated_at = tc.q_updated_at
-    #         #
-    #         self.readtext_id = str(tc.rt_uniq_id)
-    #         self.readtext = tc.rt_read_text
-    #         self.readtext_created_at = tc.rt_created_at
-    #         self.readtext_updated_at = tc.rt_updated_at
-    #         #
-    #         self.record_id = str(tc.rc_uniq_id)
-    #         self.record_filename = tc.rc_filename
-    #         self.record_created_at = tc.rc_created_at
-    #         self.record_updated_at = tc.rc_updated_at
-    #         #
-    #         self.commentar_id = str(tc.c_uniq_id)
-    #         self.commentar = tc.c_commentar
-    #         self.commentar_created_at = tc.c_created_at
-    #         self.commentar_updated_at = tc.c_updated_at
+def create_topiccombo_from_db_model(tc: TopicCombiDB = None):
+    if tc:
+        print(tc.t_uniq_id, tc.q_uniq_id)
+        tt = []
+        for i in range(0, len(tc.tt_tag_uuids)):
+            tt.append(
+                TagAndID(str(tc.tt_tag_uuids[i]), tc.tt_tags[i])
+            )
+        return TopicOverviewGet(
+            topic_id = str(tc.t_uniq_id),
+            topic_title = tc.t_title,
+            topic_created_at = tc.t_created_at,
+            topic_updated_at = tc.t_updated_at,
+            #
+            nbr_answer = tc.nbr_answers,
+            #
+            tag_and_ids = tt,
+            #
+            question_id = str(tc.q_uniq_id),
+            question_created_at = tc.q_created_at,
+            question_updated_at = tc.q_updated_at,
+            #
+            readtext_id = str(tc.rt_uniq_id),
+            readtext = tc.rt_read_text,
+            readtext_created_at = tc.rt_created_at,
+            readtext_updated_at = tc.rt_updated_at,
+            #
+            record_id = str(tc.rc_uniq_id),
+            record_filename = tc.rc_filename,
+            record_created_at = tc.rc_created_at,
+            record_updated_at = tc.rc_updated_at,
+            #
+            commentar_id = str(tc.c_uniq_id),
+            commentar = tc.c_commentar,
+            commentar_created_at = tc.c_created_at,
+            commentar_updated_at = tc.c_updated_at
+        )
+            
+    return None
 
 
 
