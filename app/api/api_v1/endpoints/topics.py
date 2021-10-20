@@ -22,7 +22,7 @@ def get_own_topics(
     """
     Get topics created by current user
     """
-    topics = crud.topic.get_combi_by_topic_id(db=db, id=current_user.id)
+    topics = crud.topic.get_combi_by_user_id(db=db, owner_id=current_user.id)
     # topics = crud.topic.get_combi_by_user_id(db=db, owner_id=278)
     r = []
     for topic in topics:
@@ -31,15 +31,15 @@ def get_own_topics(
             r.append(temp)
     return r
 
-@router.post("/test-any/", status_code=200)
-def test_any(
-    db: Session = Depends(deps.get_db)
-) -> Any:
-    """
-    Test anything.
-    """
-    # r = crud.answer.get_answers_combi_by_topic_id(db=db, id=1, limit=1)
-    r = crud.topic.get_combi_by_topic_id(db=db, id=3, limit=1)
-    # r = crud.question.get_combi_by_topic_id(db=db, id=1, limit=1)
-    return r
+# @router.post("/test-any/", status_code=200)
+# def test_any(
+#     db: Session = Depends(deps.get_db)
+# ) -> Any:
+#     """
+#     Test anything.
+#     """
+#     # r = crud.answer.get_answers_combi_by_topic_id(db=db, id=1, limit=1)
+#     r = crud.topic.get_combi_by_topic_id(db=db, id=3, limit=1)
+#     # r = crud.question.get_combi_by_topic_id(db=db, id=1, limit=1)
+#     return r
     # return {"msg": "Test request sent"}

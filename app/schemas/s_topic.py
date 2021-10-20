@@ -20,10 +20,11 @@ class TopicOverviewGet(BaseModel):
     topic_created_at: datetime
     topic_updated_at: datetime
     #
+    owner_id: str
+    owner_username: str
+    #
     nbr_answer: int
     #
-    # tag_ids: list=[UUID]
-    # tags: list=[str]
     tag_and_ids: list
     #
     question_id: str
@@ -47,7 +48,6 @@ class TopicOverviewGet(BaseModel):
 
 def create_topiccombo_from_db_model(tc: TopicCombiDB = None):
     if tc:
-        print(tc.t_uniq_id, tc.q_uniq_id)
         tt = []
         for i in range(0, len(tc.tt_tag_uuids)):
             tt.append(
@@ -58,6 +58,9 @@ def create_topiccombo_from_db_model(tc: TopicCombiDB = None):
             topic_title = tc.t_title,
             topic_created_at = tc.t_created_at,
             topic_updated_at = tc.t_updated_at,
+            #
+            owner_id = str(tc.u_uniq_id),
+            owner_username = tc.u_username,
             #
             nbr_answer = tc.nbr_answers,
             #

@@ -47,6 +47,9 @@ class TopicCombiDB(Base):
     t_created_at = Column(DateTime(), nullable=False)
     t_updated_at = Column(DateTime(), nullable=False)
     #
+    u_uniq_id: uuid.UUID = Column(UUID(as_uuid=True), default=uuid.uuid4)
+    u_username = Column(String)
+    #
     nbr_answers = Column(Integer)
     #
     tt_tag_uuids = Column(ARRAY(UUID(as_uuid=True), dimensions=1))
