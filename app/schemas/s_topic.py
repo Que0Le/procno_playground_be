@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime, time, timedelta
 
 from pydantic import BaseModel, EmailStr
@@ -6,12 +6,12 @@ from uuid import UUID
 
 from app.models.m_topic import TopicCombiDB
 
-class TagAndID():
+class TagAndID(BaseModel):
     tag_id: str
     tag: str
-    def __init__(self, id, tag):
-        self.tag_id = id
-        self.tag = tag
+    # def __init__(self, id, tag):
+    #     self.tag_id = id
+    #     self.tag = tag
 
 """ TopicOverview """
 class TopicOverviewGet(BaseModel):
@@ -25,7 +25,7 @@ class TopicOverviewGet(BaseModel):
     #
     nbr_answer: int
     #
-    tag_and_ids: list
+    tag_and_ids: List[TagAndID] = None
     #
     question_id: str
     question_created_at: datetime
@@ -51,7 +51,7 @@ def create_topiccombo_from_db_model(tc: TopicCombiDB = None):
         tt = []
         for i in range(0, len(tc.tt_tag_uuids)):
             tt.append(
-                TagAndID(str(tc.tt_tag_uuids[i]), tc.tt_tags[i])
+                TagAndID(tag_id=str(tc.tt_tag_uuids[i]), tag=tc.tt_tags[i])
             )
         return TopicOverviewGet(
             topic_id = str(tc.t_uniq_id),
