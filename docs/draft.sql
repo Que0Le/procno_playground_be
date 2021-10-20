@@ -79,29 +79,32 @@ select
 	topics.created_at t_created_at,
 	topics.updated_at t_updated_at,
 	----------
-	temp1_tags.tt_tags,
-	temp1_tags.tt_tag_uuids,
+	temp_owner.u_uniq_id,
+	temp_owner.u_username,
 	----------
-	temp2_nbr_ans.nbr_answers,
+	temp_tags.tt_tags,
+	temp_tags.tt_tag_uuids,
 	----------
-	temp3_question_data.q_uniq_id,
-	temp3_question_data.q_created_at,
-	temp3_question_data.q_updated_at,
+	temp_nbr_ans.nbr_answers,
+	----------
+	temp_question_data.q_uniq_id,
+	temp_question_data.q_created_at,
+	temp_question_data.q_updated_at,
 	--
-	temp3_question_data.rt_uniq_id,
-	temp3_question_data.rt_read_text,
-	temp3_question_data.rt_created_at,
-	temp3_question_data.rt_updated_at,
+	temp_question_data.rt_uniq_id,
+	temp_question_data.rt_read_text,
+	temp_question_data.rt_created_at,
+	temp_question_data.rt_updated_at,
 	--
-	temp3_question_data.rc_uniq_id,
-	temp3_question_data.rc_filename,
-	temp3_question_data.rc_created_at,
-	temp3_question_data.rc_updated_at,
+	temp_question_data.rc_uniq_id,
+	temp_question_data.rc_filename,
+	temp_question_data.rc_created_at,
+	temp_question_data.rc_updated_at,
 	--
-	temp3_question_data.c_uniq_id,
-	temp3_question_data.c_commentar,
-	temp3_question_data.c_created_at,
-	temp3_question_data.c_updated_at
+	temp_question_data.c_uniq_id,
+	temp_question_data.c_commentar,
+	temp_question_data.c_created_at,
+	temp_question_data.c_updated_at
 from topics
 -- temp table for tags for topic id
 inner join (	
@@ -115,8 +118,8 @@ inner join (
 	INNER JOIN tags
 	ON tags.id = tag_topic.tag_id
 	GROUP BY topics.id, topics.title
-) temp1_tags 
-on temp1_tags.t_id = topics.id
+) temp_tags 
+on temp_tags.t_id = topics.id
 -- temp table for number of answers
 inner join (	
 	SELECT 
@@ -124,8 +127,8 @@ inner join (
 		count( topic_answer.answer_id ) as nbr_answers
 	FROM topics LEFT JOIN topic_answer ON topics.id=topic_answer.topic_id 
 	GROUP BY topics.id
-) temp2_nbr_ans 
-on temp2_nbr_ans.t_id = topics.id
+) temp_nbr_ans 
+on temp_nbr_ans.t_id = topics.id
 -- temp table for question data: text+comment+record file
 -------------------------------------------------------------------------------------------------
 inner join (
@@ -156,8 +159,22 @@ inner join (
 		read_texts.uniq_id, read_texts.read_text, read_texts.created_at, read_texts.updated_at,
 		records.uniq_id, records.filename, records.created_at, records.updated_at,
 		commentars.uniq_id, commentars.commentar, commentars.created_at, commentars.updated_at
-) temp3_question_data
-on temp3_question_data.t_id = topics.id 
+) temp_question_data
+on temp_question_data.t_id = topics.id 
+-- temp table for user infor: uuid and username
+-------------------------------------------------------------------------------------------------
+inner join (	
+	SELECT 
+		topics.id as t_id, 
+		users.username as u_username,
+		users.uniq_id as u_uniq_id
+	FROM topics
+	INNER JOIN users
+	ON topics.owner_id = users.id
+	GROUP BY topics.id, users.username, users.uniq_id
+) temp_owner 
+on temp_owner.t_id = topics.id
+-------------------------------------------------------------------------------------------------
 where topics.id in (
 	select id from topics where owner_id = :owner_id
 )
