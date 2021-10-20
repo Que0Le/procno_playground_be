@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 router = APIRouter()
 
 
-@router.get("/own-topics/", response_model=List[schemas.TopicOverviewGet], status_code=201)
+@router.get("/own-topics/", response_model=List[schemas.TopicOverviewGet], status_code=200)
 @router.get("/own-topics/", status_code=201)
 def get_own_topics(
     db: Session = Depends(deps.get_db),
