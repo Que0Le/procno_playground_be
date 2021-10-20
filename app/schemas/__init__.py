@@ -9,6 +9,9 @@ from .s_answer import (
 from .s_question import (
     QuestionBase, QuestionCreate, QuestionUpdate, QuestionInDBBase
 )
+from .s_topic import (
+    TopicOverviewGet
+)
 from .small_schemas import (
     RoleBase, RoleCreate, RoleUpdate, RoleInDBBase,
     UserRoleBase, UserRoleCreate, UserRoleUpdate, UserRoleInDBBase,
