@@ -45,7 +45,8 @@ CREATE TABLE public.users (
 	created_at timestamptz NOT NULL DEFAULT now(),
 	updated_at timestamptz NOT NULL DEFAULT now(),
 	uniq_id uuid DEFAULT uuid_generate_v4 (),
-	CONSTRAINT users_pkey PRIMARY KEY (id)
+-- 	CONSTRAINT users_pkey PRIMARY KEY (id)
+	CONSTRAINT users_pkey PRIMARY KEY (uniq_id)
 );
 CREATE UNIQUE INDEX ix_users_email ON public.users USING btree (email);
 CREATE UNIQUE INDEX ix_users_username ON public.users USING btree (username);
@@ -66,7 +67,8 @@ CREATE TABLE public.roles (
 	created_at timestamptz NOT NULL DEFAULT now(),
 	updated_at timestamptz NOT NULL DEFAULT now(),
 	uniq_id uuid DEFAULT uuid_generate_v4 (),
-	CONSTRAINT roles_pkey PRIMARY KEY (id)
+-- 	CONSTRAINT roles_pkey PRIMARY KEY (id)
+	CONSTRAINT roles_pkey PRIMARY KEY (uniq_id)
 );
 CREATE UNIQUE INDEX ix_roles_rolename ON public.roles USING btree (role_name);
 CREATE UNIQUE INDEX ix_roles_uniq_id ON public.roles USING btree (uniq_id);
@@ -80,12 +82,14 @@ update
 ----------- CREATE table tags for topic
 ----------------------------------------------
 CREATE TABLE public.user_role (
-	user_id int4 NOT NULL,
-	role_id int4 NOT NULL,
+    id serial NOT NULL,
+    uniq_id uuid DEFAULT uuid_generate_v4 (),
+	user_uniq_id uuid NOT NULL,
+	role_uniq_id uuid NOT NULL,
 	created_at timestamptz NOT NULL DEFAULT now(),
 	updated_at timestamptz NOT NULL DEFAULT now(),
-	FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE cascade,
-	FOREIGN KEY (role_id) REFERENCES public.roles(id) ON DELETE cascade
+	FOREIGN KEY (user_uniq_id) REFERENCES public.users(uniq_id) ON DELETE cascade,
+	FOREIGN KEY (role_uniq_id) REFERENCES public.roles(uniq_id) ON DELETE cascade
 );
 -- Table Triggers
 create trigger update_user_role_modtime before
@@ -98,13 +102,14 @@ update
 ----------------------------------------------
 CREATE TABLE public.records (
 	id serial NOT NULL,
-	owner_id int4 not null,
+	owner_uniq_id uuid not null,
 	filename text NOT NULL,
 	created_at timestamptz NOT NULL DEFAULT now(),
 	updated_at timestamptz NOT NULL DEFAULT now(),
 	uniq_id uuid DEFAULT uuid_generate_v4 (),
-	CONSTRAINT records_pkey PRIMARY KEY (id),
-	FOREIGN KEY (owner_id) REFERENCES public.users(id) ON DELETE cascade
+-- 	CONSTRAINT records_pkey PRIMARY KEY (id),
+	CONSTRAINT records_pkey PRIMARY KEY (uniq_id),
+	FOREIGN KEY (owner_uniq_id) REFERENCES public.users(uniq_id) ON DELETE cascade
 );
 CREATE UNIQUE INDEX ix_records_filename ON public.records USING btree (filename);
 CREATE UNIQUE INDEX ix_records_uniq_id ON public.records USING btree (uniq_id);
@@ -120,13 +125,14 @@ update
 ----------------------------------------------
 CREATE TABLE public.commentars (
 	id serial NOT NULL,
-	owner_id int4 not null,
+	owner_uniq_id uuid not null,
 	commentar text NOT NULL,
 	created_at timestamptz NOT NULL DEFAULT now(),
 	updated_at timestamptz NOT NULL DEFAULT now(),
 	uniq_id uuid DEFAULT uuid_generate_v4 (),
-	CONSTRAINT commentars_pkey PRIMARY KEY (id),
-	FOREIGN KEY (owner_id) REFERENCES public.users(id) ON DELETE cascade
+-- 	CONSTRAINT commentars_pkey PRIMARY KEY (id),
+	CONSTRAINT commentars_pkey PRIMARY KEY (uniq_id),
+	FOREIGN KEY (owner_uniq_id) REFERENCES public.users(uniq_id) ON DELETE cascade
 );
 CREATE UNIQUE INDEX ix_commentars_uniq_id ON public.commentars USING btree (uniq_id);
 -- Table Triggers
@@ -140,13 +146,14 @@ update
 ----------------------------------------------
 CREATE TABLE public.read_texts (
 	id serial NOT NULL,
-	owner_id int4 not null,
+	owner_uniq_id uuid not null,
 	read_text text NOT NULL,
 	created_at timestamptz NOT NULL DEFAULT now(),
 	updated_at timestamptz NOT NULL DEFAULT now(),
 	uniq_id uuid DEFAULT uuid_generate_v4 (),
-	CONSTRAINT texts_pkey PRIMARY KEY (id),
-	FOREIGN KEY (owner_id) REFERENCES public.users(id) ON DELETE cascade
+-- 	CONSTRAINT texts_pkey PRIMARY KEY (id),
+	CONSTRAINT texts_pkey PRIMARY KEY (uniq_id),
+	FOREIGN KEY (owner_uniq_id) REFERENCES public.users(uniq_id) ON DELETE cascade
 );
 CREATE UNIQUE INDEX ix_read_texts_uniq_id ON public.read_texts USING btree (uniq_id);
 -- Table Triggers
@@ -161,18 +168,18 @@ update
 
 CREATE TABLE public.questions (
 	id serial NOT NULL,
-	owner_id int4 not null,
-	commentar_id int4 not null,
-	record_id int4 not null,
-	text_id int4 not null,
+	owner_uniq_id uuid not null,
+	commentar_uniq_id uuid not null,
+	record_uniq_id uuid not null,
+	text_uniq_id uuid not null,
 	created_at timestamptz NOT NULL DEFAULT now(),
 	updated_at timestamptz NOT NULL DEFAULT now(),
 	uniq_id uuid DEFAULT uuid_generate_v4 (),
-	CONSTRAINT questions_pkey PRIMARY KEY (id),
-	FOREIGN KEY (owner_id) REFERENCES public.users(id) ON DELETE cascade,
-	FOREIGN KEY (commentar_id) REFERENCES public.commentars(id) ON DELETE cascade,
-	FOREIGN KEY (record_id) REFERENCES public.records(id) ON DELETE cascade,
-	FOREIGN KEY (text_id) REFERENCES public.read_texts(id) ON DELETE cascade
+	CONSTRAINT questions_pkey PRIMARY KEY (uniq_id),
+	FOREIGN KEY (owner_uniq_id) REFERENCES public.users(uniq_id) ON DELETE cascade,
+	FOREIGN KEY (commentar_uniq_id) REFERENCES public.commentars(uniq_id) ON DELETE cascade,
+	FOREIGN KEY (record_uniq_id) REFERENCES public.records(uniq_id) ON DELETE cascade,
+	FOREIGN KEY (text_uniq_id) REFERENCES public.read_texts(uniq_id) ON DELETE cascade
 );
 CREATE UNIQUE INDEX ix_questions_uniq_id ON public.questions USING btree (uniq_id);
 -- Table Triggers
@@ -187,16 +194,16 @@ update
 
 CREATE TABLE public.answers (
 	id serial NOT NULL,
-	owner_id int4 not null,
-	commentar_id int4 not null,
-	record_id int4 not null,
+	owner_uniq_id uuid not null,
+	commentar_uniq_id uuid not null,
+	record_uniq_id uuid not null,
 	created_at timestamptz NOT NULL DEFAULT now(),
 	updated_at timestamptz NOT NULL DEFAULT now(),
 	uniq_id uuid DEFAULT uuid_generate_v4 (),
-	CONSTRAINT answers_pkey PRIMARY KEY (id),
-	FOREIGN KEY (owner_id) REFERENCES public.users(id) ON DELETE cascade,
-	FOREIGN KEY (commentar_id) REFERENCES public.commentars(id) ON DELETE cascade,
-	FOREIGN KEY (record_id) REFERENCES public.records(id) ON DELETE cascade
+	CONSTRAINT answers_pkey PRIMARY KEY (uniq_id),
+	FOREIGN KEY (owner_uniq_id) REFERENCES public.users(uniq_id) ON DELETE cascade,
+	FOREIGN KEY (commentar_uniq_id) REFERENCES public.commentars(uniq_id) ON DELETE cascade,
+	FOREIGN KEY (record_uniq_id) REFERENCES public.records(uniq_id) ON DELETE cascade
 );
 CREATE UNIQUE INDEX ix_answers_uniq_id ON public.answers USING btree (uniq_id);
 -- Table Triggers
@@ -211,7 +218,7 @@ update
 ----------------------------------------------
 CREATE TABLE public.topics (
 	id serial NOT NULL,
-	owner_id int4 not null,
+	owner_uniq_id uuid not null,
 	title text NOT NULL,
 	source_language text not null,
 	source_level text not null,
@@ -219,8 +226,8 @@ CREATE TABLE public.topics (
 	created_at timestamptz NOT NULL DEFAULT now(),
 	updated_at timestamptz NOT NULL DEFAULT now(),
 	uniq_id uuid DEFAULT uuid_generate_v4 (),
-	CONSTRAINT topics_pkey PRIMARY KEY (id),
-	FOREIGN KEY (owner_id) REFERENCES public.users(id) ON DELETE cascade
+	CONSTRAINT topics_pkey PRIMARY KEY (uniq_id),
+	FOREIGN KEY (owner_uniq_id) REFERENCES public.users(uniq_id) ON DELETE cascade
 );
 CREATE UNIQUE INDEX ix_topics_title ON public.topics USING btree (title);
 CREATE UNIQUE INDEX ix_topics_uniq_id ON public.topics USING btree (uniq_id);
@@ -235,12 +242,14 @@ update
 ----------------------------------------------
 
 CREATE TABLE public.topic_answer (
-	topic_id int4 not null,
-	answer_id int4 not null,
+    id serial NOT NULL,
+    uniq_id uuid DEFAULT uuid_generate_v4 (),
+	topic_uniq_id uuid not null,
+	answer_uniq_id uuid not null,
 	created_at timestamptz NOT NULL DEFAULT now(),
 	updated_at timestamptz NOT NULL DEFAULT now(),
-	FOREIGN KEY (topic_id) REFERENCES public.topics(id) ON DELETE cascade,
-	FOREIGN KEY (answer_id) REFERENCES public.answers(id) ON DELETE cascade
+	FOREIGN KEY (topic_uniq_id) REFERENCES public.topics(uniq_id) ON DELETE cascade,
+	FOREIGN KEY (answer_uniq_id) REFERENCES public.answers(uniq_id) ON DELETE cascade
 );
 -- Table Triggers
 create trigger update_topic_answer_modtime before
@@ -253,12 +262,14 @@ update
 ----------------------------------------------
 
 CREATE TABLE public.topic_question (
-	topic_id int4 not null,
-	question_id int4 not null,
+    id serial NOT NULL,
+    uniq_id uuid DEFAULT uuid_generate_v4 (),
+	topic_uniq_id uuid not null,
+	question_uniq_id uuid not null,
 	created_at timestamptz NOT NULL DEFAULT now(),
 	updated_at timestamptz NOT NULL DEFAULT now(),
-	FOREIGN KEY (topic_id) REFERENCES public.topics(id) ON DELETE cascade,
-	FOREIGN KEY (question_id) REFERENCES public.questions(id) ON DELETE cascade
+	FOREIGN KEY (topic_uniq_id) REFERENCES public.topics(uniq_id) ON DELETE cascade,
+	FOREIGN KEY (question_uniq_id) REFERENCES public.questions(uniq_id) ON DELETE cascade
 );
 -- Table Triggers
 create trigger update_topic_answer_modtime before
@@ -276,7 +287,8 @@ CREATE TABLE public.tags (
 	created_at timestamptz NOT NULL DEFAULT now(),
 	updated_at timestamptz NOT NULL DEFAULT now(),
 	uniq_id uuid DEFAULT uuid_generate_v4 (),
-	CONSTRAINT tags_pkey PRIMARY KEY (id)
+-- 	CONSTRAINT tags_pkey PRIMARY KEY (id)
+	CONSTRAINT tags_pkey PRIMARY KEY (uniq_id)
 );
 CREATE UNIQUE INDEX ix_tags_tname ON public.tags USING btree (tag_name);
 CREATE UNIQUE INDEX ix_tags_uniq_id ON public.tags USING btree (uniq_id);
@@ -290,12 +302,14 @@ update
 ----------- CREATE table tags for topic
 ----------------------------------------------
 CREATE TABLE public.tag_topic (
-	topic_id int4 NOT NULL,
-	tag_id int4 NOT NULL,
+    id serial NOT NULL,
+    uniq_id uuid DEFAULT uuid_generate_v4 (),
+	topic_uniq_id uuid NOT NULL,
+	tag_uniq_id uuid NOT NULL,
 	created_at timestamptz NOT NULL DEFAULT now(),
 	updated_at timestamptz NOT NULL DEFAULT now(),
-	FOREIGN KEY (topic_id) REFERENCES public.topics(id) ON DELETE cascade,
-	FOREIGN KEY (tag_id) REFERENCES public.tags(id) ON DELETE cascade
+	FOREIGN KEY (topic_uniq_id) REFERENCES public.topics(uniq_id) ON DELETE cascade,
+	FOREIGN KEY (tag_uniq_id) REFERENCES public.tags(uniq_id) ON DELETE cascade
 );
 -- Table Triggers
 create trigger update_tag_topic_modtime before
