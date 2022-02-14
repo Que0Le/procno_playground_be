@@ -6,7 +6,7 @@ import random
 
 # Connect to an existing database
 try:
-    conn = psycopg2.connect("dbname='testing' user='postgres' host='192.168.1.23' password='postgres'")
+    conn = psycopg2.connect("dbname='TESTINGDB' user='postgres' host='192.168.1.23' password='postgres'")
     cur = conn.cursor()
 except:
     print("I am unable to connect to the database")
@@ -66,7 +66,7 @@ def add_records_to_random_user():
                 print(row)
 
 add_user_from_fakes()           
-all_users_id = queries.get_all_users_id(conn)
+all_users_uniq_id = queries.get_all_users_id(conn)
 
 # create topic
 ## pic a user, create question, create text and commentar and record. Also create tags and add to tag_topic
@@ -85,6 +85,7 @@ list_record_files = [
     "1k_records_filename_9.csv"
 ]
 print("Reading recor filenames from files ...")
+
 for f in list_record_files:
     with open("fake_data/"+f, "r") as csvfile:
         data = csv.reader(csvfile, delimiter=',', quotechar='"')
@@ -101,7 +102,7 @@ for f in list_record_files:
                 break
             except:
                 print(str(f) + ":" + str(row))
-list_commentar_files= [
+list_commentar_files = [
     "commentars.csv", "commentars_2.csv", "commentars_3.csv", 
     "commentars_4.csv", "commentars_5.csv", "commentars_6.csv", 
     "commentars_7.csv", "commentars_8.csv", "commentars_9.csv"
@@ -157,11 +158,11 @@ for f in ["topic.csv", "topic_2.csv"]:
                     continue
                 # title, source_lang, source_level, wish_lang[], tags[],
                 wish_lang = []
-                if row[4]!='':
+                if row[4] != '':
                     wish_lang.append(row[4])
-                if row[5]!='':
+                if row[5] != '':
                     wish_lang.append(row[5])
-                if row[6]!='':
+                if row[6] != '':
                     wish_lang.append(row[6])
                 topics.append(
                     [row[1], row[2], row[3], wish_lang, row[7].split(' ')]
@@ -181,13 +182,13 @@ print("read_texts_text: " + str(len(read_texts_text)))
 random.shuffle(topics)
 print("topics: " + str(len(topics)))
 
-#all_users_id
+# all_users_id
 count_topic = 0
 for topic in topics:
     # Create a question by 
     # 1.record 2.read_text 3.commentar
     try:
-        topic_owner_id = random.choice(all_users_id)
+        topic_owner_uniq_id = random.choice(all_users_uniq_id)
         record_filename = records_filename.pop()
         read_text_text = read_texts_text.pop()
         commentar_commentar = commentars_commentar.pop()
@@ -197,21 +198,21 @@ for topic in topics:
         continue
     try:
         inserted_record = queries.add_record(conn,
-                            owner_id=topic_owner_id,
+                            owner_id=topic_owner_uniq_id,
                             filename=record_filename)
         conn.commit()
         inserted_text = queries.add_read_text(conn,
-                            owner_id=topic_owner_id,
+                            owner_id=topic_owner_uniq_id,
                             read_text=read_text_text)
         conn.commit()
         inserted_commentar = queries.add_commentar(conn,
-                            owner_id=topic_owner_id,
+                            owner_id=topic_owner_uniq_id,
                             commentar=commentar_commentar)
         conn.commit()
 
         # Now create question
         inserted_question = queries.add_question(conn,
-                        owner_id=topic_owner_id,
+                        owner_id=topic_owner_uniq_id,
                         commentar_id = inserted_commentar[0], 
                         record_id = inserted_record[0], 
                         text_id = inserted_text[0])
@@ -221,7 +222,7 @@ for topic in topics:
         # with these information
         inserted_topic = queries.add_topic(
             conn,
-            owner_id=topic_owner_id,
+            owner_id=topic_owner_uniq_id,
             title=topic[0],
             source_language=topic[1],
             source_level=topic[2],
@@ -247,7 +248,7 @@ for topic in topics:
     for tag in topic[4]:
         try:
             tag_id = queries.get_tagid_by_tagname(conn, tag_name=tag)
-            if tag_id==None:
+            if tag_id is None:
                 r = queries.add_tag(conn, tag_name=tag)
                 # print(r)
                 conn.commit()
@@ -268,32 +269,40 @@ for topic in topics:
         # Create a ans by 
         # 1.record 2.read_text 3.commentar
         try:
-            topic_owner_id = random.choice(all_users_id)
+            topic_owner_id = random.choice(all_users_uniq_id)
             record_filename = records_filename.pop()
             commentar_commentar = commentars_commentar.pop()
         except:
             print("failed get data")
             continue
         try:
-            inserted_record = queries.add_record(conn,
-                                owner_id=topic_owner_id,
-                                filename=record_filename)
+            inserted_record = queries.add_record(
+                conn,
+                owner_uniq_id=topic_owner_uniq_id,
+                filename=record_filename
+            )
             conn.commit()
-            inserted_commentar = queries.add_commentar(conn,
-                                owner_id=topic_owner_id,
-                                commentar=commentar_commentar)
+            inserted_commentar = queries.add_commentar(
+                conn,
+                owner_uniq_id=topic_owner_id,
+                commentar=commentar_commentar
+            )
             conn.commit()
 
             # Now create answer
-            inserted_answer = queries.add_answer(conn,
-                            owner_id=topic_owner_id,
-                            commentar_id = inserted_commentar[0], 
-                            record_id = inserted_record[0]) 
+            inserted_answer = queries.add_answer(
+                conn,
+                owner_uniq_id=topic_owner_id,
+                commentar_uniq_id=inserted_commentar[0],
+                record_uniq_id=inserted_record[0]
+            )
             conn.commit()
             # Add to topic answer
-            inserted_topic_answer = queries.add_topic_answer(conn,
-                    topic_id=inserted_topic[0],
-                    answer_id=inserted_answer[0])
+            inserted_topic_answer = queries.add_topic_answer(
+                conn,
+                topic_uniq_id=inserted_topic[0],
+                answer_uniq_id=inserted_answer[0]
+            )
             conn.commit()
         except:
             print(f"Failed create answer for topic id={str(inserted_topic[0])}")
