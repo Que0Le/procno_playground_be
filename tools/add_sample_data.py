@@ -66,7 +66,7 @@ def add_records_to_random_user():
                 print(row)
 
 add_user_from_fakes()           
-all_users_uniq_id = queries.get_all_users_id(conn)
+all_users_uniq_id = queries.get_all_users_uniq_id(conn)
 
 # create topic
 ## pic a user, create question, create text and commentar and record. Also create tags and add to tag_topic
@@ -197,32 +197,40 @@ for topic in topics:
         exit()
         continue
     try:
-        inserted_record = queries.add_record(conn,
-                            owner_id=topic_owner_uniq_id,
-                            filename=record_filename)
+        inserted_record = queries.add_record(
+            conn,
+            owner_uniq_id=topic_owner_uniq_id,
+            filename=record_filename
+        )
         conn.commit()
-        inserted_text = queries.add_read_text(conn,
-                            owner_id=topic_owner_uniq_id,
-                            read_text=read_text_text)
+        inserted_text = queries.add_read_text(
+            conn,
+            owner_uniq_id=topic_owner_uniq_id,
+            read_text=read_text_text
+        )
         conn.commit()
-        inserted_commentar = queries.add_commentar(conn,
-                            owner_id=topic_owner_uniq_id,
-                            commentar=commentar_commentar)
+        inserted_commentar = queries.add_commentar(
+            conn,
+            owner_uniq_id=topic_owner_uniq_id,
+            commentar=commentar_commentar
+        )
         conn.commit()
 
         # Now create question
-        inserted_question = queries.add_question(conn,
-                        owner_id=topic_owner_uniq_id,
-                        commentar_id = inserted_commentar[0], 
-                        record_id = inserted_record[0], 
-                        text_id = inserted_text[0])
+        inserted_question = queries.add_question(
+            conn,
+            owner_uniq_id=topic_owner_uniq_id,
+            commentar_uniq_id = inserted_commentar[0], 
+            record_uniq_id = inserted_record[0], 
+            text_uniq_id = inserted_text[0]
+        )
         conn.commit()
 
         # Create topic
         # with these information
         inserted_topic = queries.add_topic(
             conn,
-            owner_id=topic_owner_uniq_id,
+            owner_uniq_id=topic_owner_uniq_id,
             title=topic[0],
             source_language=topic[1],
             source_level=topic[2],
@@ -232,8 +240,8 @@ for topic in topics:
         # ... and add to topic_question
         inserted_topic_question = queries.add_topic_question(
             conn,
-            topic_id=inserted_topic[0],
-            question_id=inserted_question[0]
+            topic_uniq_id=inserted_topic[0],
+            question_uniq_id=inserted_question[0]
         )
         # print(r)
         conn.commit()
@@ -247,17 +255,17 @@ for topic in topics:
     # Create tags/get tags id for topic
     for tag in topic[4]:
         try:
-            tag_id = queries.get_tagid_by_tagname(conn, tag_name=tag)
-            if tag_id is None:
+            tag_uniq_id = queries.get_tag_uniq_id_by_tagname(conn, tag_name=tag)
+            if tag_uniq_id is None:
                 r = queries.add_tag(conn, tag_name=tag)
                 # print(r)
                 conn.commit()
-                tag_id = r[0]
+                tag_uniq_id = r[0]
             # insert to tag_topic
             inserted_tag_topic = queries.add_tag_topic(
                 conn,
-                topic_id=inserted_topic[0],
-                tag_id=tag_id
+                topic_uniq_id=inserted_topic[0],
+                tag_uniq_id=tag_uniq_id
             )
             conn.commit()
         except:

@@ -28,7 +28,7 @@ select * from public.users
 where id = :id
 limit 1;
 
--- name: get_all_users_id
+-- name: get_all_users_uniq_id
 select uniq_id from public.users;
 
 
@@ -81,7 +81,7 @@ VALUES (:topic_uniq_id, :question_uniq_id)
 RETURNING
     created_at, updated_at;
 
--- name: get_tagid_by_tagname<!
+-- name: get_tag_uniq_id_by_tagname<!
 select uniq_id from public.tags
 where tag_name = :tag_name
 LIMIT 1;
@@ -93,7 +93,7 @@ RETURNING
     uniq_id, created_at, updated_at;
 
 -- name: add_tag_topic<!
-INSERT INTO public.tag_topic (topic_id, tag_id)
-VALUES (:topic_id, :tag_id)
+INSERT INTO public.tag_topic (topic_uniq_id, tag_uniq_id)
+VALUES (:topic_uniq_id, :tag_uniq_id)
 RETURNING
     created_at, updated_at;
