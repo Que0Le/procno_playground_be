@@ -1,42 +1,46 @@
-from typing import Any, Dict, Optional, Union, List
+# from typing import Any, Dict, Optional, Union, List
+from typing import Optional, List
 
 from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
 from app.models.m_topic import TopicDB, TopicCombiDB
-from app.models.m_answer import AnswerCombiDB
-from app.schemas.topic import TopicBase, TopicCreate, TopicUpdate, TopicInDBBase
+# from app.models.m_answer import AnswerCombiDB
+from app.schemas.topic import TopicCreate, TopicUpdate
 from sqlalchemy import text
 
 
 class CRUDTopic(CRUDBase[TopicDB, TopicCreate, TopicUpdate]):
+    @staticmethod
     def get_all_by_topic_title(
-            self, db: Session, *, title: str, skip=0, limit=100
+            db: Session, *, title: str, skip=0, limit=100
     ) -> Optional[TopicDB]:
         return (
             db.query(TopicDB)
-                .filter(TopicDB.title == title)
-                .offset(skip)
-                .limit(limit)
-                .all()
+            .filter(TopicDB.title == title)
+            .offset(skip)
+            .limit(limit)
+            .all()
         )
 
+    @staticmethod
     def get_one_by_topic_title(
-            self, db: Session, *, title: str
+            db: Session, *, title: str
     ) -> Optional[TopicDB]:
         return (
             db.query(TopicDB)
-                .filter(TopicDB.title == title)
-                .first()
+            .filter(TopicDB.title == title)
+            .first()
         )
 
-    def get_one_by_topic_id(
-            self, db: Session, *, id: int
+    @staticmethod
+    def get_one_by_topic_uniq_id(
+            db: Session, *, uniq_id: str
     ) -> Optional[TopicDB]:
         return (
             db.query(TopicDB)
-                .filter(TopicDB.id == id)
-                .first()
+            .filter(TopicDB.uniq_id == uniq_id)
+            .first()
         )
 
     # def get_combi_by_topic_id(
@@ -130,8 +134,9 @@ class CRUDTopic(CRUDBase[TopicDB, TopicCreate, TopicUpdate]):
     #         result
     #     )
 
+    @staticmethod
     def get_combi_by_user_id(
-            self, db: Session, *, owner_uniq_id: str, skip: object = 0, limit: object = 100
+            db: Session, *, owner_uniq_id: str, skip: object = 0, limit: object = 100
     ) -> Optional[List[TopicCombiDB]]:
         sm = """
             -- get topic-combi by owner id
@@ -252,9 +257,9 @@ class CRUDTopic(CRUDBase[TopicDB, TopicCreate, TopicUpdate]):
             """
         result = (
             db.query(TopicCombiDB)
-                .from_statement(text(sm))
-                .params(owner_uniq_id=owner_uniq_id, skip=skip, limit=limit)
-                .all()
+            .from_statement(text(sm))
+            .params(owner_uniq_id=owner_uniq_id, skip=skip, limit=limit)
+            .all()
         )
         return (
             result
