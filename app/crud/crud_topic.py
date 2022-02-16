@@ -8,34 +8,35 @@ from app.models.m_answer import AnswerCombiDB
 from app.schemas.topic import TopicBase, TopicCreate, TopicUpdate, TopicInDBBase
 from sqlalchemy import text
 
+
 class CRUDTopic(CRUDBase[TopicDB, TopicCreate, TopicUpdate]):
     def get_all_by_topic_title(
-        self, db: Session, *, title: str, skip=0, limit=100
+            self, db: Session, *, title: str, skip=0, limit=100
     ) -> Optional[TopicDB]:
         return (
             db.query(TopicDB)
-            .filter(TopicDB.title == title)
-            .offset(skip)
-            .limit(limit)
-            .all()
+                .filter(TopicDB.title == title)
+                .offset(skip)
+                .limit(limit)
+                .all()
         )
 
     def get_one_by_topic_title(
-        self, db: Session, *, title: str
+            self, db: Session, *, title: str
     ) -> Optional[TopicDB]:
         return (
             db.query(TopicDB)
-            .filter(TopicDB.title == title)
-            .first()
+                .filter(TopicDB.title == title)
+                .first()
         )
 
     def get_one_by_topic_id(
-        self, db: Session, *, id: int
+            self, db: Session, *, id: int
     ) -> Optional[TopicDB]:
         return (
             db.query(TopicDB)
-            .filter(TopicDB.id == id)
-            .first()
+                .filter(TopicDB.id == id)
+                .first()
         )
 
     # def get_combi_by_topic_id(
@@ -130,7 +131,7 @@ class CRUDTopic(CRUDBase[TopicDB, TopicCreate, TopicUpdate]):
     #     )
 
     def get_combi_by_user_id(
-        self, db: Session, *, owner_uniq_id: str, skip=0, limit=100
+            self, db: Session, *, owner_uniq_id: str, skip: object = 0, limit: object = 100
     ) -> Optional[List[TopicCombiDB]]:
         sm = """
             -- get topic-combi by owner id
@@ -147,10 +148,10 @@ class CRUDTopic(CRUDBase[TopicDB, TopicCreate, TopicUpdate]):
                 temp_owner.u_uniq_id,
                 temp_owner.u_username,
                 ----------
+                temp_nbr_ans.nbr_answers,
+                ----------
                 temp_tags.tt_tags,
                 temp_tags.tt_tag_uuids,
-                ----------
-                temp_nbr_ans.nbr_answers,
                 ----------
                 temp_question_data.q_uniq_id,
                 temp_question_data.q_created_at,
@@ -251,14 +252,13 @@ class CRUDTopic(CRUDBase[TopicDB, TopicCreate, TopicUpdate]):
             """
         result = (
             db.query(TopicCombiDB)
-            .from_statement(text(sm))
-            .params(owner_uniq_id=owner_uniq_id, skip=skip, limit=limit)
-            .all()
+                .from_statement(text(sm))
+                .params(owner_uniq_id=owner_uniq_id, skip=skip, limit=limit)
+                .all()
         )
         return (
             result
         )
-
 
     # def create(self, db: Session, *, obj_in: UserCreate) -> UserDB:
     #     salt = generate_salt()

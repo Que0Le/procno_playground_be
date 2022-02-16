@@ -22,7 +22,7 @@ def get_own_topics(
     """
     Get topics created by current user
     """
-    topics = crud.topic.get_combi_by_user_id(db=db, owner_id=current_user.id)
+    topics = crud.topic.get_combi_by_user_id(db=db, owner_uniq_id=current_user.uniq_id)
     # topics = crud.topic.get_combi_by_user_id(db=db, owner_id=278)
     r = []
     for topic in topics:
