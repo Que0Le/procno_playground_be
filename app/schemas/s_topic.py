@@ -46,7 +46,7 @@ class TopicOverviewGet(BaseModel):
     commentar_created_at: datetime
     commentar_updated_at: datetime
 
-def create_topiccombo_from_db_model(tc: TopicCombiDB = None):
+def create_topic_combo_from_db_model(tc: TopicCombiDB = None):
     if tc:
         tt = []
         for i in range(0, len(tc.tt_tag_uuids)):

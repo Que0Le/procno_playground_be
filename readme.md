@@ -1,16 +1,24 @@
+# Procno backend
 
+# Initialtion
 
-
-Run without docker:
-
-```bash
+### Start the environment:
+```shell
 poetry install
 poetry shell
+```
+### Create tables and add example data:
+```shell
+cd tools
+python add_sample_data.py
+```
 
-alembic upgrade head
+### Run the backend:
+```bash
+#alembic upgrade head
 # init first start
-python app/backend_pre_start.py
-python app/initial_data.py
+#python app/backend_pre_start.py
+#python app/initial_data.py
 
 # start the server
 uvicorn app.main:app --host 0.0.0.0 --port 8888
@@ -18,3 +26,10 @@ uvicorn app.main:app --host 0.0.0.0 --port 8888
 
 BIG TODO:
 - Migration using Alembic. For now, stick with plain SQL.
+
+## Some helper SQL
+```sql
+-- Count topics of users
+select owner_uniq_id, count(id) counted from topics group by topics.owner_uniq_id order by counted desc 
+
+```

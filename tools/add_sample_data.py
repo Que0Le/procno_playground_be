@@ -10,6 +10,12 @@ try:
     cur = conn.cursor()
 except:
     print("I am unable to connect to the database")
+
+# Run the init script
+cur.execute(open("./init_procno_db.sql", "r").read())
+
+# exit()
+
 queries = aiosql.from_path("./queries.sql", "psycopg2")
 
 def add_user_from_fakes():
@@ -227,7 +233,7 @@ for topic in topics:
         conn.commit()
 
         # Create topic
-        # with these information
+        # with this information
         inserted_topic = queries.add_topic(
             conn,
             owner_uniq_id=topic_owner_uniq_id,

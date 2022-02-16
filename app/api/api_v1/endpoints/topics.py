@@ -26,7 +26,7 @@ def get_own_topics(
     # topics = crud.topic.get_combi_by_user_id(db=db, owner_id=278)
     r = []
     for topic in topics:
-        temp = schemas.create_topiccombo_from_db_model(topic)
+        temp = schemas.create_topic_combo_from_db_model(topic)
         if temp:
             r.append(temp)
     return r
