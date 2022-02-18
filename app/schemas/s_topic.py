@@ -22,6 +22,9 @@ class TopicOverviewGet(BaseModel):
     topic_id: str
     topic_uniq_id: str
     topic_title: str
+    source_language: str
+    source_level: str
+    wish_correct_languages: List[str]
     topic_created_at: datetime
     topic_updated_at: datetime
     #
@@ -64,6 +67,9 @@ def create_topic_combo_from_db_model(tc: TopicCombiDB = None):
             topic_id=tc.t_id,
             topic_uniq_id=str(tc.t_uniq_id),
             topic_title=tc.t_title,
+            source_language=tc.t_source_language,
+            source_level=tc.t_source_level,
+            wish_correct_languages=tc.t_wish_correct_languages,
             topic_created_at=tc.t_created_at,
             topic_updated_at=tc.t_updated_at,
             #

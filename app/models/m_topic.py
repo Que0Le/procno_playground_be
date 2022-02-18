@@ -46,7 +46,7 @@ class TopicCombiDB(Base):
     t_title = Column(String)
     t_source_language = Column(String)
     t_source_level = Column(String)
-    t_wish_correct_languages = Column(String)
+    t_wish_correct_languages = Column(ARRAY(String, dimensions=1))
     t_created_at = Column(DateTime(), nullable=False)
     t_updated_at = Column(DateTime(), nullable=False)
     #
