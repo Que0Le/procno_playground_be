@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
 from app.models.m_question import QuestionDB, QuestionCombiDB
-from app.schemas.s_question import QuestionBase, QuestionCreate, QuestionUpdate, QuestionInDBBase
+from app.schemas.s_question import QuestionBase, QuestionCreate, QuestionUpdate
 from sqlalchemy import text
 
 class CRUDQuestion(CRUDBase[QuestionDB, QuestionCreate, QuestionUpdate]):

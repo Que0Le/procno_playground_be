@@ -265,6 +265,24 @@ class CRUDTopic(CRUDBase[TopicDB, TopicCreate, TopicUpdate]):
             result
         )
 
+    @staticmethod
+    def get_topic_by_uniq_id(
+            db: Session, *, uniq_id: str
+    ) -> Optional[TopicDB]:
+        sm = """
+            -- get topic-combi by owner id
+            SELECT * FROM public.topics WHERE uniq_id = :uniq_id
+            """
+        result = (
+            db.query(TopicDB)
+            .from_statement(text(sm))
+            .params(uniq_id=uniq_id)
+            .one()
+        )
+        return (
+            result
+        )
+
     # def create(self, db: Session, *, obj_in: UserCreate) -> UserDB:
     #     salt = generate_salt()
     #     db_obj = UserDB(

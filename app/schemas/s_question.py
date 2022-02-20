@@ -4,6 +4,8 @@ from pydantic import BaseModel, EmailStr
 
 
 """ Question """
+
+
 class QuestionBase(BaseModel):
     owner_id: int
     commentar_id: int
@@ -21,7 +23,11 @@ class QuestionUpdate(QuestionBase):
     pass
 
 
-class QuestionInDBBase(QuestionBase):
+class QuestionGet(QuestionBase):
     pass
-    class Config:
-        orm_mode = True
+
+
+# class QuestionInDBBase(QuestionBase):
+#     pass
+#     class Config:
+#         orm_mode = True

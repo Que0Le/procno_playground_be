@@ -7,7 +7,7 @@ from .s_answer import (
     AnswerBase, AnswerCreate, AnswerUpdate, AnswerInDBBase
 )
 from .s_question import (
-    QuestionBase, QuestionCreate, QuestionUpdate, QuestionInDBBase
+    QuestionBase, QuestionCreate, QuestionUpdate
 )
 from .s_topic import (
     TopicOverviewGet, create_topic_combo_from_db_model

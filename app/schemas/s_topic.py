@@ -2,7 +2,7 @@ from typing import List
 from datetime import datetime
 
 from pydantic import BaseModel
-# from uuid import UUID
+from uuid import UUID
 
 from app.models.m_topic import TopicCombiDB
 
@@ -13,6 +13,27 @@ class TagAndID(BaseModel):
     # def __init__(self, id, tag):
     #     self.tag_id = id
     #     self.tag = tag
+
+
+class TopicGet(BaseModel):
+    __slots__ = [
+        'uniq_id', 'owner_uniq_id', 'title',
+        'source_language', 'source_level',
+        'wish_correct_languages',
+        'created_at', 'updated_at'
+    ]
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    uniq_id: UUID
+    owner_uniq_id: UUID
+    title: str
+    source_language: str
+    source_level: str
+    wish_correct_languages: List[str]
+    created_at: datetime
+    updated_at: datetime
 
 
 """ TopicOverview """

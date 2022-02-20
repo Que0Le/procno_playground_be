@@ -37,12 +37,14 @@ async def get_record_by_file(record_filename: str):
     )
 
 
-@router.get("/dummies-records/")
-async def get_dummies_record_by_random():
-    """ Return a random audio file ("mp3", "wav") in records folder """
-    listdir = os.listdir("./data/records/")
+@router.get("/dummies-records/{record_filename}")
+async def get_dummies_record_by_random(record_filename: str):
+    """ Return a random audio file ("mp3", "wav") in short_audio_samples folder.
+    Don't care about record_filename """
+    listdir = os.listdir("./data/short_audio_samples/")
     listfiles = [item for item in listdir if item.split(".")[-1] in ["mp3", "wav"]]
     random_file = random.choice(listfiles)
+    # print(listfiles)
     return FileResponse(
-        "./data/records/" + random_file
+        "./data/short_audio_samples/" + random_file
     )
