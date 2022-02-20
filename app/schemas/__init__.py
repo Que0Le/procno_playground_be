@@ -10,7 +10,7 @@ from .s_question import (
     QuestionBase, QuestionCreate, QuestionUpdate
 )
 from .s_topic import (
-    TopicOverviewGet, create_topic_combo_from_db_model
+    TopicOverviewGet, create_topic_combi_from_db_model
 )
 from .small_schemas import (
     RoleBase, RoleCreate, RoleUpdate, RoleInDBBase,

@@ -24,17 +24,17 @@ def get_own_topic_overviews(
     """
     Get topic overviews created by current user
     """
-    topics = crud.topic.get_combi_by_user_id(db=db, owner_uniq_id=current_user.uniq_id)
+    topics_db = crud.topic.get_combi_by_user_id(db=db, owner_uniq_id=current_user.uniq_id)
     r = []
-    for topic in topics:
-        temp = schemas.create_topic_combo_from_db_model(topic)
+    for topic_db in topics_db:
+        temp = schemas.create_topic_combi_from_db_model(topic_db)
         if temp:
             r.append(temp)
     return r
 
 
-@router.get("/uniq_id/{uniq_id}", status_code=200)
-def get_topic_by_uniq_id(
+@router.get("/uniq_id/{uniq_id}", response_model=schemas.TopicOverviewGet, status_code=200)
+def get_topic_overview_by_uniq_id(
     *,
     db: Session = Depends(deps.get_db),
     uniq_id: str
@@ -42,9 +42,9 @@ def get_topic_by_uniq_id(
     """
     Get a topic by its uniq_id
     """
-    topic_db = crud.topic.get_topic_by_uniq_id(db=db, uniq_id=uniq_id)
-    topic_get = TopicGet(**topic_db.__dict__)
-    return {topic_get}
+    topic_db = crud.topic.get_combi_by_topic_uniq_id(db=db, topic_uniq_id=uniq_id)
+    topic_get = schemas.create_topic_combi_from_db_model(topic_db)
+    return topic_get
 
 
 # @router.post("/test-any/", status_code=200)

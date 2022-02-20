@@ -40,7 +40,7 @@ class TopicGet(BaseModel):
 
 
 class TopicOverviewGet(BaseModel):
-    topic_id: str
+    # topic_id: str
     topic_uniq_id: str
     topic_title: str
     source_language: str
@@ -76,16 +76,16 @@ class TopicOverviewGet(BaseModel):
     commentar_updated_at: datetime
 
 
-def create_topic_combo_from_db_model(tc: TopicCombiDB = None):
+def create_topic_combi_from_db_model(tc: TopicCombiDB = None):
     if tc:
-        print(tc.tt_tag_uuids)
+        # print(tc.tt_tag_uuids)
         tag_and_uniq_id_s = []
         for i in range(0, len(tc.tt_tag_uuids)):
             tag_and_uniq_id_s.append(
                 TagAndID(tag_uniq_id=str(tc.tt_tag_uuids[i]), tag=tc.tt_tags[i])
             )
         return TopicOverviewGet(
-            topic_id=tc.t_id,
+            # topic_id=tc.t_id,
             topic_uniq_id=str(tc.t_uniq_id),
             topic_title=tc.t_title,
             source_language=tc.t_source_language,
