@@ -29,7 +29,7 @@ def get_own_answers(
 
 
 @router.get(
-    "/from-topic/{topic_uniq_id}",
+    "/for-topic/{topic_uniq_id}",
     response_model=List[schemas.s_answer.AnswerOverviewGet],
     status_code=200
 )
