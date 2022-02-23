@@ -16,18 +16,19 @@ def create_new_own_topic(
     current_user: models.UserDB = Depends(deps.get_current_user),
     topic_create: schemas.s_topic.TopicCreate,
 ) -> Any:
+    topic_create.topic_title = topic_create.topic_title + str(datetime.now())
     topic_create.owner_uniq_id = current_user.uniq_id
     topic_create.owner_username = current_user.username
-    topic_create.record_filename = str(datetime.now())
+    topic_create.record_filename = str(datetime.now())  # TODO: record audio
 
     # Add to topic table
-    topic_db = crud.topic.create(db=db, topic_create=topic_create)
+    topic_db = crud.topic.create_topic(db=db, topic_create=topic_create)
 
     # Add tags and relation with topic
     tag_db_s = []
     tag_topic_db_s = []
     for tag_name in topic_create.tags:
-        tag_db = crud.tag.create_tag(db=db, tag_name=tag_name)
+        tag_db = crud.tag.create_tag(db=db, tag_name=tag_name + str(datetime.now()), description="")
         tag_db_s.append(tag_db)
         #
         tag_topic_db = crud.tag_topic.create_tag_topic_relation(
@@ -36,7 +37,7 @@ def create_new_own_topic(
         tag_topic_db_s.append(tag_topic_db)
 
     # Add record
-    record_db = crud.record.create_record(
+    record_db = crud.crud_record.create_record(
         db=db,
         filename=topic_create.record_filename, owner_uniq_id=topic_create.owner_uniq_id
     )
@@ -62,9 +63,13 @@ def create_new_own_topic(
         topic_uniq_id=topic_db.uniq_id, question_uniq_id=question_db.uniq_id
     )
 
+    # Now try retrieve the recently added topic:
+    topic_db = crud.topic.get_combi_by_topic_uniq_id(db=db, topic_uniq_id=topic_db.uniq_id)
+    topic_get = schemas.create_topic_combi_from_db_model(topic_db)
+
     return {
         "status": "success",
-        "topic": topic_db
+        "topic": topic_get
     }
 
 

@@ -11,7 +11,7 @@ queries_tag = QueryTag
 
 class QueryTagTopic:
     INSERT_SINGLE = """
-    insert into public.tags (topic_uniq_id, tag_uniq_id) 
+    insert into public.tag_topic (topic_uniq_id, tag_uniq_id) 
     values (:topic_uniq_id, :tag_uniq_id) 
     returning *
     """
@@ -34,7 +34,7 @@ queries_read_text = QueryReadText
 class QueryRecord:
     INSERT_SINGLE = """
     insert into public.records (owner_uniq_id, filename) 
-    values (:filename, :owner_uniq_id) 
+    values (:owner_uniq_id, :filename) 
     returning *
     """
 

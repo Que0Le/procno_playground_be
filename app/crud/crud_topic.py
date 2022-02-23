@@ -16,8 +16,10 @@ from sqlalchemy import text
 
 class CRUDTopic(CRUDBase[TopicDB, TopicCreate, TopicUpdate]):
     # Only create the topic, not the relation with question, tag, record, ...
-    def create(
-            self, db: Session, *,  topic_create: s_topic.TopicCreate) -> m_topic.TopicDB:
+    @staticmethod
+    def create_topic(
+            db: Session, *,  topic_create: s_topic.TopicCreate
+    ) -> m_topic.TopicDB:
         result = db.execute(
             text(queries_topic.INSERT_SINGLE),
             {
