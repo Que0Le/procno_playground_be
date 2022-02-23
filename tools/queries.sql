@@ -73,13 +73,13 @@ RETURNING
 INSERT INTO public.topic_answer (topic_uniq_id, answer_uniq_id)
 VALUES (:topic_uniq_id, :answer_uniq_id)
 RETURNING
-    created_at, updated_at;
+    uniq_id, created_at, updated_at;
 
 -- name: add_topic_question<!
 INSERT INTO public.topic_question (topic_uniq_id, question_uniq_id)
 VALUES (:topic_uniq_id, :question_uniq_id)
 RETURNING
-    created_at, updated_at;
+    uniq_id, created_at, updated_at;
 
 -- name: get_tag_uniq_id_by_tagname<!
 select uniq_id from public.tags

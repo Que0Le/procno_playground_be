@@ -18,6 +18,7 @@ cur.execute(open("./init_procno_db.sql", "r").read())
 
 queries = aiosql.from_path("./queries.sql", "psycopg2")
 
+
 def add_user_from_fakes():
     with open("fake_data/1k_fake_user_with_true_salt_and_hash.csv", "r") as csvfile:
         data = csv.reader(csvfile, delimiter=',', quotechar='"')
@@ -43,8 +44,9 @@ def add_user_from_fakes():
                 break
             except:
                 print(row)
-                if count==10:
+                if count == 10:
                     break
+
 
 def add_records_to_random_user():
     all_users_id = queries.get_all_users_id(conn)
@@ -59,8 +61,8 @@ def add_records_to_random_user():
                     continue
 
                 r = queries.add_record(conn,
-                                    owner_id= random.choice(all_users_id),
-                                    filename=row[1])
+                                       owner_id=random.choice(all_users_id),
+                                       filename=row[1])
                 print(r)
                 conn.commit()
                 # if count == 5:
@@ -71,7 +73,8 @@ def add_records_to_random_user():
             except:
                 print(row)
 
-add_user_from_fakes()           
+
+add_user_from_fakes()
 all_users_uniq_id = queries.get_all_users_uniq_id(conn)
 
 # create topic
@@ -84,7 +87,7 @@ read_texts_text = []
 topics = []
 
 list_record_files = [
-    "1k_records_filename.csv", "1k_records_filename_2.csv", 
+    "1k_records_filename.csv", "1k_records_filename_2.csv",
     "1k_records_filename_3.csv", "1k_records_filename_4.csv",
     "1k_records_filename_5.csv", "1k_records_filename_6.csv",
     "1k_records_filename_7.csv", "1k_records_filename_8.csv",
@@ -93,7 +96,7 @@ list_record_files = [
 print("Reading recor filenames from files ...")
 
 for f in list_record_files:
-    with open("fake_data/"+f, "r") as csvfile:
+    with open("fake_data/" + f, "r") as csvfile:
         data = csv.reader(csvfile, delimiter=',', quotechar='"')
         count = 0
         for row in data:
@@ -109,13 +112,13 @@ for f in list_record_files:
             except:
                 print(str(f) + ":" + str(row))
 list_commentar_files = [
-    "commentars.csv", "commentars_2.csv", "commentars_3.csv", 
-    "commentars_4.csv", "commentars_5.csv", "commentars_6.csv", 
+    "commentars.csv", "commentars_2.csv", "commentars_3.csv",
+    "commentars_4.csv", "commentars_5.csv", "commentars_6.csv",
     "commentars_7.csv", "commentars_8.csv", "commentars_9.csv"
 ]
 print("Reading commentars from files ...")
 for f in list_commentar_files:
-    with open("fake_data/"+f, "r") as csvfile:
+    with open("fake_data/" + f, "r") as csvfile:
         data = csv.reader(csvfile, delimiter=',', quotechar='"')
         count = 0
         for row in data:
@@ -132,7 +135,7 @@ for f in list_commentar_files:
                 print(str(f) + ":" + str(row))
 print("Reading read_texts from files ...")
 for f in ["read_texts.csv", "read_texts_2.csv", "read_texts_3.csv"]:
-    with open("fake_data/"+f, "r") as csvfile:
+    with open("fake_data/" + f, "r") as csvfile:
         data = csv.reader(csvfile, delimiter=',', quotechar='"')
         count = 0
         for row in data:
@@ -153,7 +156,7 @@ for f in ["topic.csv", "topic_2.csv"]:
     # topic_name,source_lang,source_level,
     # wish_correct_language_1,wish_correct_language_2,wish_correct_language_3,
     # tags
-    with open("fake_data/"+f, "r", encoding="utf8", errors="ignore") as csvfile:
+    with open("fake_data/" + f, "r", encoding="utf8", errors="ignore") as csvfile:
         data = csv.reader(csvfile, delimiter=',', quotechar='"')
         count = 0
         for row in data:
@@ -226,9 +229,9 @@ for topic in topics:
         inserted_question = queries.add_question(
             conn,
             owner_uniq_id=topic_owner_uniq_id,
-            commentar_uniq_id = inserted_commentar[0], 
-            record_uniq_id = inserted_record[0], 
-            text_uniq_id = inserted_text[0]
+            commentar_uniq_id=inserted_commentar[0],
+            record_uniq_id=inserted_record[0],
+            text_uniq_id=inserted_text[0]
         )
         conn.commit()
 
@@ -278,7 +281,7 @@ for topic in topics:
             print(f"failed create tag '{tag}' for topic")
 
     # Random number of answer
-    num_ans = random.randint(0,9)   
+    num_ans = random.randint(0, 9)
     for na in range(0, num_ans):
         # Create a ans by 
         # 1.record 2.read_text 3.commentar

@@ -36,11 +36,8 @@ class TopicGet(BaseModel):
     updated_at: datetime
 
 
-""" TopicOverview """
-
-
+# TopicOverview for GET
 class TopicOverviewGet(BaseModel):
-    # topic_id: str
     topic_uniq_id: str
     topic_title: str
     source_language: str
@@ -74,6 +71,39 @@ class TopicOverviewGet(BaseModel):
     commentar: str
     commentar_created_at: datetime
     commentar_updated_at: datetime
+
+
+class TopicCreate(BaseModel):
+    topic_title: str
+    source_language: str
+    source_level: str
+    wish_correct_languages: List[str]
+    #
+    owner_uniq_id: str
+    owner_username: str
+    #
+    tags: List[str]
+    #
+    readtext: str
+    #
+    record_filename: str
+    #
+    commentar: str
+
+
+class TopicQuestionBase(BaseModel):
+    topic_uniq_id: str = None
+    question_uniq_id: str = None
+
+
+# Properties to receive via API on creation
+class TopicQuestionCreate(TopicQuestionBase):
+    pass
+
+
+# Properties to receive via API on update
+class TopicQuestionUpdate(TopicQuestionBase):
+    uniq_id: str = None
 
 
 def create_topic_combi_from_db_model(tc: TopicCombiDB = None):
@@ -124,9 +154,9 @@ def create_topic_combi_from_db_model(tc: TopicCombiDB = None):
     return None
 
 
-class TopicCreate(BaseModel):
+# class TopicCreate(BaseModel):
     # topic_id: UUID
-    topic_title: str
+    # topic_title: str
     # topic_created_at: datetime
     # topic_updated_at: datetime
     #

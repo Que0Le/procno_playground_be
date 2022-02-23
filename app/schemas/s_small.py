@@ -3,7 +3,49 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr
 
 
-""" Role """
+class TagBase(BaseModel):
+    tag_name: str = None
+    description: str = None
+
+
+# Properties to receive via API on creation
+class TagCreate(TagBase):
+    pass
+
+
+# Properties to receive via API on update
+class TagUpdate(TagBase):
+    uniq_id: str = None
+
+
+class TagTopicBase(BaseModel):
+    topic_uniq_id: str = None
+    tag_uniq_id: str = None
+
+
+# Properties to receive via API on creation
+class TagTopicCreate(TagBase):
+    pass
+
+
+# Properties to receive via API on update
+class TagTopicUpdate(TagBase):
+    uniq_id: str = None
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Role
 class RoleBase(BaseModel):
     role_name: str
     description: str
@@ -21,10 +63,12 @@ class RoleUpdate(RoleBase):
 
 class RoleInDBBase(RoleBase):
     pass
+
     class Config:
         orm_mode = True
 
-""" UserRole """
+
+# UserRole
 # Shared properties
 class UserRoleBase(BaseModel):
     user_id: int
@@ -43,12 +87,14 @@ class UserRoleUpdate(UserRoleBase):
 
 class UserRoleInDBBase(UserRoleBase):
     pass
+
     class Config:
         orm_mode = True
 
-""" Record """
+
+# Record
 class RecordBase(BaseModel):
-    owner_id: int
+    owner_uniq_id: str
     filename: str
 
 
@@ -62,15 +108,10 @@ class RecordUpdate(RecordBase):
     pass
 
 
-class RecordInDBBase(RecordBase):
-    pass
-    class Config:
-        orm_mode = True
-
-""" ReadText """
+# ReadText
 class ReadTextBase(BaseModel):
-    owner_id: int
-    read_text: str
+    owner_uniq_id: int = None
+    read_text: str = None
 
 
 # Properties to receive via API on creation
@@ -80,17 +121,12 @@ class ReadTextCreate(ReadTextBase):
 
 # Properties to receive via API on update
 class ReadTextUpdate(ReadTextBase):
-    pass
+    uniq_id: str = None
 
 
-class ReadTextInDBBase(ReadTextBase):
-    pass
-    class Config:
-        orm_mode = True
-
-""" Commentar """
+# Commentar
 class CommentarBase(BaseModel):
-    owner_id: int
+    owner_uniq_id: int
     read_text: str
 
 
@@ -101,10 +137,6 @@ class CommentarCreate(CommentarBase):
 
 # Properties to receive via API on update
 class CommentarUpdate(CommentarBase):
-    pass
+    uniq_id: str = None
 
 
-class CommentarInDBBase(CommentarBase):
-    pass
-    class Config:
-        orm_mode = True

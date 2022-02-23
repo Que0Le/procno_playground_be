@@ -4,13 +4,35 @@ from typing import Optional, List
 from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
+from app.db.queries import *
+from app.models import m_small, m_question, m_answer, m_topic
+from app.schemas import s_small, s_question, s_answer, s_topic
 from app.models.m_topic import TopicDB, TopicCombiDB
 # from app.models.m_answer import AnswerCombiDB
 from app.schemas.topic import TopicCreate, TopicUpdate
 from sqlalchemy import text
+from sqlalchemy import text
 
 
 class CRUDTopic(CRUDBase[TopicDB, TopicCreate, TopicUpdate]):
+    # Only create the topic, not the relation with question, tag, record, ...
+    def create(
+            self, db: Session, *,  topic_create: s_topic.TopicCreate) -> m_topic.TopicDB:
+        result = db.execute(
+            text(queries_topic.INSERT_SINGLE),
+            {
+                "title": topic_create.topic_title,
+                "source_language": topic_create.source_language,
+                "source_level": topic_create.source_level,
+                "wish_correct_languages": topic_create.wish_correct_languages,
+                "owner_uniq_id": topic_create.owner_uniq_id,
+            }
+        )
+        db.commit()
+        results_as_dict = result.mappings().all()
+        topic_db = m_topic.TopicDB(**results_as_dict[0])
+        return topic_db
+
     @staticmethod
     def get_all_by_topic_title(
             db: Session, *, title: str, skip=0, limit=100
@@ -346,3 +368,22 @@ class CRUDTopic(CRUDBase[TopicDB, TopicCreate, TopicUpdate]):
 
 
 topic = CRUDTopic(TopicDB)
+
+
+class CRUDTopicQuestion(CRUDBase[m_topic.TopicQuestionDB, s_small.TagTopicCreate, s_small.TagTopicUpdate]):
+    @staticmethod
+    def create_topic_question_relation(
+            self, db: Session, *, topic_uniq_id: str, question_uniq_id: str
+    ) -> m_topic.TopicQuestionDB:
+        result = db.execute(
+            text(queries_tag.INSERT_SINGLE),
+            {"topic_uniq_id": topic_uniq_id, "question_uniq_id": question_uniq_id}
+        )
+        db.commit()
+        results_as_dict = result.mappings().all()
+        topic_question_db = m_topic.TopicQuestionDB(**results_as_dict[0])
+        return topic_question_db
+
+
+topic_question = CRUDTopicQuestion(m_topic.TopicQuestionDB)
+

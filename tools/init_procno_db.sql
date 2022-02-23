@@ -248,7 +248,7 @@ CREATE TABLE public.topic_answer (
 	answer_uniq_id uuid not null,
 	created_at timestamptz NOT NULL DEFAULT now(),
 	updated_at timestamptz NOT NULL DEFAULT now(),
-	CONSTRAINT topics_pkey PRIMARY KEY (uniq_id),
+-- 	CONSTRAINT topics_pkey PRIMARY KEY (uniq_id),
 	FOREIGN KEY (topic_uniq_id) REFERENCES public.topics(uniq_id) ON DELETE cascade,
 	FOREIGN KEY (answer_uniq_id) REFERENCES public.answers(uniq_id) ON DELETE cascade
 );
@@ -269,7 +269,7 @@ CREATE TABLE public.topic_question (
 	question_uniq_id uuid not null,
 	created_at timestamptz NOT NULL DEFAULT now(),
 	updated_at timestamptz NOT NULL DEFAULT now(),
-	CONSTRAINT topics_pkey PRIMARY KEY (uniq_id),
+-- 	CONSTRAINT topics_pkey PRIMARY KEY (uniq_id),
 	FOREIGN KEY (topic_uniq_id) REFERENCES public.topics(uniq_id) ON DELETE cascade,
 	FOREIGN KEY (question_uniq_id) REFERENCES public.questions(uniq_id) ON DELETE cascade
 );

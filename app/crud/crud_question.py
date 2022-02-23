@@ -3,48 +3,54 @@ from typing import Any, Dict, Optional, Union, List
 from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
-from app.models.m_question import QuestionDB, QuestionCombiDB
-from app.schemas.s_question import QuestionBase, QuestionCreate, QuestionUpdate
+# from app.models.m_question import QuestionDB, QuestionCombiDB
+# from app.schemas.s_question import QuestionBase, QuestionCreate, QuestionUpdate
 from sqlalchemy import text
+from app.db.queries import *
+from app.schemas import s_small, s_topic, s_question
+from app.models import m_small, m_topic, m_answer, m_question
 
-class CRUDQuestion(CRUDBase[QuestionDB, QuestionCreate, QuestionUpdate]):
-    
-    def get_combi_by_topic_id(
-        self, db: Session, *, id: int, skip=0, limit=100
-    ) -> Optional[List[QuestionCombiDB]]:
-        sm = """
-            SELECT 
-                questions.id as q_id,
-                questions.created_at as q_created_at,
-                questions.updated_at as q_updated_at,
-                read_texts.read_text as rt_read_text,
-                read_texts.created_at as rt_created_at,
-                read_texts.updated_at as rt_updated_at,
-                records.filename as rc_filename,
-                records.created_at as rc_created_at,
-                records.updated_at as rc_updated_at,
-                commentars.commentar as c_commentar,
-                commentars.created_at as c_created_at,
-                commentars.updated_at as c_updated_at
-            FROM questions 
-            LEFT JOIN read_texts ON questions.text_id =read_texts.id 
-            LEFT JOIN records ON questions.record_id =records.id 
-            LEFT JOIN commentars ON questions.commentar_id =commentars.id 
-            where questions.id = (
-                select topics.question_id 
-                from topics 
-                where topics.id = :topic_id
-            )
-            """
-        result = (
-            db.query(QuestionCombiDB)
-            .from_statement(text(sm))
-            .params(topic_id=id)
-            .all()
+
+class CRUDQuestion(CRUDBase[m_question.QuestionDB, s_question.QuestionCreate, s_question.QuestionUpdate]):
+
+    @staticmethod
+    def create_question(
+            self, db: Session, *,
+            owner_uniq_id: str, commentar_uniq_id: str,
+            record_uniq_id: str, text_uniq_id: str
+    ) -> Optional[m_question.QuestionDB]:
+        result = db.execute(
+            text(queries_question.INSERT_SINGLE),
+            {
+                "owner_uniq_id": owner_uniq_id, "commentar_uniq_id": commentar_uniq_id,
+                "record_uniq_id": record_uniq_id, "text_uniq_id": text_uniq_id
+            }
         )
-        return (
-            result
+        db.commit()
+        results_as_dict = result.mappings().all()
+        question_db = m_question.QuestionDB(**results_as_dict[0])
+        return question_db
+
+
+question = CRUDQuestion(m_question.QuestionDB)
+
+
+class CRUDTopicQuestion(CRUDBase[m_topic.TopicQuestionDB, s_topic.TopicQuestionCreate, s_topic.TopicQuestionUpdate]):
+    @staticmethod
+    def create_topic_question(
+            self, db: Session, *,
+            owner_uniq_id: str, question_uniq_id: str
+    ) -> Optional[m_topic.TopicQuestionDB]:
+        result = db.execute(
+            text(queries_topic_question.INSERT_SINGLE),
+            {
+                "owner_uniq_id": owner_uniq_id, "question_uniq_id": question_uniq_id,
+            }
         )
+        db.commit()
+        results_as_dict = result.mappings().all()
+        topic_question_db = m_topic.TopicQuestionDB(**results_as_dict[0])
+        return topic_question_db
 
 
-question = CRUDQuestion(QuestionDB)
+topic_question = CRUDTopicQuestion(m_topic.TopicQuestionDB)

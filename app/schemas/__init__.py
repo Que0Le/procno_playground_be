@@ -12,10 +12,10 @@ from .s_question import (
 from .s_topic import (
     TopicOverviewGet, create_topic_combi_from_db_model
 )
-from .small_schemas import (
+from .s_small import (
     RoleBase, RoleCreate, RoleUpdate, RoleInDBBase,
     UserRoleBase, UserRoleCreate, UserRoleUpdate, UserRoleInDBBase,
-    RecordBase, RecordCreate, RecordUpdate, RecordInDBBase,
-    ReadTextBase, ReadTextCreate, ReadTextUpdate, ReadTextInDBBase,
-    CommentarBase, CommentarCreate, CommentarUpdate, CommentarInDBBase
+    RecordBase, RecordCreate, RecordUpdate,
+    ReadTextBase, ReadTextCreate, ReadTextUpdate,
+    CommentarBase, CommentarCreate, CommentarUpdate,
 )

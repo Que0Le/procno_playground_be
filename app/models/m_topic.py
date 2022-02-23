@@ -77,3 +77,15 @@ class TopicCombiDB(Base):
     c_commentar = Column(String)
     c_created_at = Column(DateTime(), nullable=False)
     c_updated_at = Column(DateTime(), nullable=False)
+
+
+class TopicQuestionDB(Base):
+    # overwrite the table name
+    __tablename__ = 'topic_question'
+    id = Column(Integer, autoincrement=True)
+    uniq_id: uuid.UUID = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    topic_uniq_id: uuid.UUID = Column(UUID(as_uuid=True), ForeignKey("users.uniq_id"))
+    question_uniq_id: uuid.UUID = Column(UUID(as_uuid=True), ForeignKey("questions.uniq_id"))
+    created_at = Column(DateTime(), nullable=False)
+    updated_at = Column(DateTime(), nullable=False)
+

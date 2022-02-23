@@ -6,3 +6,4 @@ app.egg-info
 .env
 test.py
 data/
+testing/

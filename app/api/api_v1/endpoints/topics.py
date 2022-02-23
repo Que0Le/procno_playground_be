@@ -1,19 +1,71 @@
 from typing import Any, List
-
 from fastapi import APIRouter, Depends
-# from pydantic.networks import EmailStr
-
 from app import models, schemas, crud
 from app.api import deps
-# from app.core.celery_app import celery_app
-# from app.schemas.s_topic import TopicOverviewGet
-# from app.utils import send_test_email
 from sqlalchemy.orm import Session
 from datetime import datetime
-from app.schemas.s_topic import TopicGet
-from uuid import UUID
+# from uuid import UUID
 
 router = APIRouter()
+
+
+@router.post("/own-topics/", status_code=200)
+def create_new_own_topic(
+    *,
+    db: Session = Depends(deps.get_db),
+    current_user: models.UserDB = Depends(deps.get_current_user),
+    topic_create: schemas.s_topic.TopicCreate,
+) -> Any:
+    topic_create.owner_uniq_id = current_user.uniq_id
+    topic_create.owner_username = current_user.username
+    topic_create.record_filename = str(datetime.now())
+
+    # Add to topic table
+    topic_db = crud.topic.create(db=db, topic_create=topic_create)
+
+    # Add tags and relation with topic
+    tag_db_s = []
+    tag_topic_db_s = []
+    for tag_name in topic_create.tags:
+        tag_db = crud.tag.create_tag(db=db, tag_name=tag_name)
+        tag_db_s.append(tag_db)
+        #
+        tag_topic_db = crud.tag_topic.create_tag_topic_relation(
+            db=db, topic_uniq_id=topic_db.uniq_id, tag_uniq_id=tag_db.uniq_id
+        )
+        tag_topic_db_s.append(tag_topic_db)
+
+    # Add record
+    record_db = crud.record.create_record(
+        db=db,
+        filename=topic_create.record_filename, owner_uniq_id=topic_create.owner_uniq_id
+    )
+    # Add read text
+    readtext_db = crud.read_text.create_read_text(
+        db=db,
+        read_text_from_user=topic_create.readtext, owner_uniq_id=topic_create.owner_uniq_id
+    )
+    # Add commentar
+    commentar_db = crud.commentar.create_commentar(
+        db=db,
+        commentar_from_user=topic_create.commentar, owner_uniq_id=topic_create.owner_uniq_id
+    )
+
+    # Add question and relation with topic
+    question_db = crud.question.create_question(
+        db=db,
+        owner_uniq_id=topic_create.owner_uniq_id, commentar_uniq_id=commentar_db.uniq_id,
+        record_uniq_id=record_db.uniq_id, text_uniq_id=readtext_db.uniq_id
+    )
+    topic_question_db = crud.topic_question.create_topic_question_relation(
+        db=db,
+        topic_uniq_id=topic_db.uniq_id, question_uniq_id=question_db.uniq_id
+    )
+
+    return {
+        "status": "success",
+        "topic": topic_db
+    }
 
 
 @router.get("/own-topics/", response_model=List[schemas.TopicOverviewGet], status_code=200)
