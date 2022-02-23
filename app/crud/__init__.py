@@ -4,7 +4,7 @@ from .crud_user import user
 from .crud_topic import topic, topic_question
 from .crud_answer import answer
 from .crud_question import question
-from .crud_small import crud_record, tag, tag_topic, read_text, commentar
+from .crud_small import record, tag, tag_topic, read_text, commentar
 # For a new basic set of CRUD operations you could just do
 
 # from .base import CRUDBase

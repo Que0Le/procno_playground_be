@@ -15,7 +15,7 @@ class CRUDQuestion(CRUDBase[m_question.QuestionDB, s_question.QuestionCreate, s_
 
     @staticmethod
     def create_question(
-            self, db: Session, *,
+            db: Session, *,
             owner_uniq_id: str, commentar_uniq_id: str,
             record_uniq_id: str, text_uniq_id: str
     ) -> Optional[m_question.QuestionDB]:
@@ -38,7 +38,7 @@ question = CRUDQuestion(m_question.QuestionDB)
 class CRUDTopicQuestion(CRUDBase[m_topic.TopicQuestionDB, s_topic.TopicQuestionCreate, s_topic.TopicQuestionUpdate]):
     @staticmethod
     def create_topic_question(
-            self, db: Session, *,
+            db: Session, *,
             owner_uniq_id: str, question_uniq_id: str
     ) -> Optional[m_topic.TopicQuestionDB]:
         result = db.execute(

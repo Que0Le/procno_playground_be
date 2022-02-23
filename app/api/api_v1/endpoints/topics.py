@@ -37,7 +37,7 @@ def create_new_own_topic(
         tag_topic_db_s.append(tag_topic_db)
 
     # Add record
-    record_db = crud.crud_record.create_record(
+    record_db = crud.record.create_record(
         db=db,
         filename=topic_create.record_filename, owner_uniq_id=topic_create.owner_uniq_id
     )

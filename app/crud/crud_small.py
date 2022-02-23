@@ -58,7 +58,7 @@ class CRUDRecord(CRUDBase[m_small.RecordDB, s_small.RecordCreate, s_small.Record
         return record_db
 
 
-crud_record = CRUDTag(m_small.RecordDB)
+record = CRUDRecord(m_small.RecordDB)
 
 
 class CRUDReadText(CRUDBase[m_small.ReadTextDB, s_small.ReadTextCreate, s_small.ReadTextUpdate]):
@@ -94,4 +94,4 @@ class CRUDCommentar(CRUDBase[m_small.CommentarDB, s_small.CommentarCreate, s_sma
         return commentar_db
 
 
-commentar = CRUDReadText(m_small.CommentarDB)
+commentar = CRUDCommentar(m_small.CommentarDB)

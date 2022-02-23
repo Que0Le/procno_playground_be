@@ -375,10 +375,10 @@ topic = CRUDTopic(TopicDB)
 class CRUDTopicQuestion(CRUDBase[m_topic.TopicQuestionDB, s_small.TagTopicCreate, s_small.TagTopicUpdate]):
     @staticmethod
     def create_topic_question_relation(
-            self, db: Session, *, topic_uniq_id: str, question_uniq_id: str
+            db: Session, *, topic_uniq_id: str, question_uniq_id: str
     ) -> m_topic.TopicQuestionDB:
         result = db.execute(
-            text(queries_tag.INSERT_SINGLE),
+            text(queries_topic_question.INSERT_SINGLE),
             {"topic_uniq_id": topic_uniq_id, "question_uniq_id": question_uniq_id}
         )
         db.commit()
