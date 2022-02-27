@@ -5,8 +5,29 @@ from app.api import deps
 from sqlalchemy.orm import Session
 from datetime import datetime
 # from uuid import UUID
-
+from fastapi import Request
 router = APIRouter()
+
+
+@router.post("/test")
+def test(
+    # request: Request,
+    topic_create: schemas.s_topic.TopicCreate,
+        # current_user: models.UserDB = Depends(deps.get_current_user)
+) -> Any:
+    """
+    Test access
+    """
+    # print((request.body()))
+    print(vars(topic_create))
+    # for item in request.__dict__:
+    #     print(item)
+    return {
+        "status": "success",
+        "topic": {
+            "title": "_FAKE_TITLE_"
+        }
+    }
 
 
 @router.post("/own-topics/", status_code=200)
