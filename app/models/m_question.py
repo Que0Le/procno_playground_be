@@ -15,7 +15,7 @@ class QuestionDB(Base):
     # overwrite the table name
     __tablename__ = 'questions'
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, index=True)
     uniq_id: uuid.UUID = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     owner_uniq_id = Column(UUID(as_uuid=True), ForeignKey("users.uniq_id"))
     commentar_uniq_id = Column(UUID(as_uuid=True), ForeignKey("commentars.uniq_id"))

@@ -1,13 +1,15 @@
 from typing import Any, List
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status, HTTPException
 from app import models, schemas, crud
 from app.api import deps
 from sqlalchemy.orm import Session
 from datetime import datetime
 # from uuid import UUID
 from fastapi import Request
-router = APIRouter()
+from fastapi.responses import JSONResponse
 
+
+router = APIRouter()
 
 @router.post("/test")
 def test(
@@ -30,7 +32,7 @@ def test(
     }
 
 
-@router.post("/own-topics/", status_code=200)
+@router.post("/own-topics/", status_code=status.HTTP_201_CREATED)
 def create_new_own_topic(
     *,
     db: Session = Depends(deps.get_db),
@@ -94,7 +96,11 @@ def create_new_own_topic(
     }
 
 
-@router.get("/own-topics/", response_model=List[schemas.TopicOverviewGet], status_code=200)
+@router.get(
+    "/own-topics/",
+    response_model=List[schemas.TopicOverviewGet],
+    status_code=status.HTTP_200_OK
+)
 def get_own_topic_overviews(
     db: Session = Depends(deps.get_db),
     current_user: models.UserDB = Depends(deps.get_current_user),
@@ -109,6 +115,67 @@ def get_own_topic_overviews(
         if temp:
             r.append(temp)
     return r
+
+
+@router.delete("/uniq_id/{uniq_id}", status_code=status.HTTP_200_OK)
+def delete_topic_and_related_by_uniq_id(
+    *,
+    db: Session = Depends(deps.get_db),
+    # current_user: models.UserDB = Depends(deps.get_current_user),
+    uniq_id: str
+) -> Any:
+    """
+    Delete topic, including question, answers and related
+    """
+    topic_db = crud.topic.get_combi_by_topic_uniq_id(db=db, topic_uniq_id=uniq_id)
+    if not topic_db:
+        raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Topic not found!"
+            )
+    # if str(topic_db.u_uniq_id) != str(current_user.uniq_id):
+    #     raise HTTPException(
+    #         status_code=status.HTTP_401_UNAUTHORIZED,
+    #         detail="Not owner or admin"
+    #     )
+    # print(vars(topic_db))
+    # return {}
+    # Delete question:
+    # Get question, record, commentar uniq_id
+    # Delete record
+    record = crud.record.remove(db=db, uniq_id=str(topic_db.rc_uniq_id))
+    # record = crud.record.remove(db=db, uniq_id="76ed8c88-0dcb-4174-ab65-e03aadc29747")
+    # Delete readtext
+    read_text = crud.read_text.remove(db=db, uniq_id=str(topic_db.rt_uniq_id))
+    # read_text = crud.read_text.remove(db=db, uniq_id="c275e0d3-7323-4dbb-8073-f7095401ab09")
+    # Delete commentar
+    commentar = crud.commentar.remove(db=db, uniq_id=str(topic_db.c_uniq_id))
+    # commentar = crud.commentar.remove(db=db, uniq_id="ca73d1c8-cf4e-4af9-b70a-5ea21afa3fa5")
+    # Delete question
+    print("############################" + str(topic_db.q_uniq_id))
+    # question = crud.question.remove(db=db, uniq_id=str(topic_db.q_uniq_id))
+    # question = crud.question.remove(db=db, uniq_id="ac874d4e-3127-4030-8e90-d4d1cbcd94cf")
+    # Delete topic_question
+    topic_question = crud.topic_question.remove_by_topic_uniq_id(
+        db=db, topic_uniq_id=str(topic_db.t_uniq_id)
+    )
+    # topic_question = crud.topic_question.remove_by_topic_uniq_id(
+    #     db=db, topic_uniq_id="502c462c-ae8c-440e-91dd-6a2ae95aa997"
+    # )
+
+    # Delete answers:
+    # Get all answer, record, commentar uniq_ids
+    # Delete record
+    # Delete commentar
+    # Delete answer
+    # Delete topic_answer
+
+    # Delete topic
+    topic = crud.topic.remove(uniq_id=str(topic_db.t_uniq_id))
+    # topic = crud.topic.remove(db=db, uniq_id="502c462c-ae8c-440e-91dd-6a2ae95aa997")
+
+
+    return {"status": "success"}
 
 
 @router.get("/uniq_id/{uniq_id}", response_model=schemas.TopicOverviewGet, status_code=200)

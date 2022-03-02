@@ -24,18 +24,6 @@ class TopicDB(Base):
     created_at = Column(DateTime(), nullable=False)
     updated_at = Column(DateTime(), nullable=False)
 
-    def to_string(self):
-        return str(
-            f"TopicDB:\nid[{str(self.id)}]\n\
-            owner_id[{str(self.owner_id)}]\n\
-            title[{str(self.title)}]\n\
-            source_language[{str(self.source_language)}]\n\
-            source_level[{str(self.source_level)}]\n\
-            wish_correct_languages[{str(self.wish_correct_languages)}]\n\
-            question_id[{str(self.question_id)}]\n\
-            created_at[{str(self.created_at)}]\n\
-            updated_at[{str(self.updated_at)}]")
-
 
 class TopicCombiDB(Base):
     # overwrite the table name

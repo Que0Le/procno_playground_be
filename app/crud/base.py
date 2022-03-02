@@ -39,6 +39,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db.refresh(db_obj)
         return db_obj
 
+    # TODO: update with uniq_id in str?
     def update(
         self,
         db: Session,
@@ -59,7 +60,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db.refresh(db_obj)
         return db_obj
 
-    def remove(self, db: Session, *, uniq_id: int) -> ModelType:
+    def remove(self, db: Session, *, uniq_id: str) -> ModelType:
         obj = db.query(self.model).get(uniq_id)
         db.delete(obj)
         db.commit()
