@@ -39,6 +39,13 @@ class CRUDTagTopic(CRUDBase[m_small.TagTopicDB, s_small.TagTopicCreate, s_small.
         tag_topic_db = m_small.TagTopicDB(**results_as_dict[0])
         return tag_topic_db
 
+    @staticmethod
+    def remove_by_topic_uniq_id(db: Session, *, topic_uniq_id: str) -> m_small.TagTopicDB:
+        obj = db.query(m_small.TagTopicDB).filter(m_small.TagTopicDB.topic_uniq_id == topic_uniq_id).delete()
+        # db.delete(obj)
+        db.commit()
+        return obj
+
 
 tag_topic = CRUDTagTopic(m_small.TagTopicDB)
 

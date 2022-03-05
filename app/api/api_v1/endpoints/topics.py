@@ -133,6 +133,8 @@ def delete_topic_and_related_by_uniq_id(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Topic not found!"
             )
+    # print("############################" + str(topic_db.t_uniq_id))
+    # return
     # if str(topic_db.u_uniq_id) != str(current_user.uniq_id):
     #     raise HTTPException(
     #         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -140,8 +142,19 @@ def delete_topic_and_related_by_uniq_id(
     #     )
     # print(vars(topic_db))
     # return {}
+
     # Delete question:
     # Get question, record, commentar uniq_id
+    # Delete topic_question
+    topic_question = crud.topic_question.remove_by_topic_uniq_id(
+        db=db, topic_uniq_id=str(topic_db.t_uniq_id)
+    )
+    # topic_question = crud.topic_question.remove_by_topic_uniq_id(
+    #     db=db, topic_uniq_id="502c462c-ae8c-440e-91dd-6a2ae95aa997"
+    # )
+    # Delete question
+    question = crud.question.remove(db=db, uniq_id=str(topic_db.q_uniq_id))
+    # question = crud.question.remove(db=db, uniq_id="ac874d4e-3127-4030-8e90-d4d1cbcd94cf")
     # Delete record
     record = crud.record.remove(db=db, uniq_id=str(topic_db.rc_uniq_id))
     # record = crud.record.remove(db=db, uniq_id="76ed8c88-0dcb-4174-ab65-e03aadc29747")
@@ -151,17 +164,6 @@ def delete_topic_and_related_by_uniq_id(
     # Delete commentar
     commentar = crud.commentar.remove(db=db, uniq_id=str(topic_db.c_uniq_id))
     # commentar = crud.commentar.remove(db=db, uniq_id="ca73d1c8-cf4e-4af9-b70a-5ea21afa3fa5")
-    # Delete question
-    print("############################" + str(topic_db.q_uniq_id))
-    # question = crud.question.remove(db=db, uniq_id=str(topic_db.q_uniq_id))
-    # question = crud.question.remove(db=db, uniq_id="ac874d4e-3127-4030-8e90-d4d1cbcd94cf")
-    # Delete topic_question
-    topic_question = crud.topic_question.remove_by_topic_uniq_id(
-        db=db, topic_uniq_id=str(topic_db.t_uniq_id)
-    )
-    # topic_question = crud.topic_question.remove_by_topic_uniq_id(
-    #     db=db, topic_uniq_id="502c462c-ae8c-440e-91dd-6a2ae95aa997"
-    # )
 
     # Delete answers:
     # Get all answer, record, commentar uniq_ids
@@ -170,10 +172,12 @@ def delete_topic_and_related_by_uniq_id(
     # Delete answer
     # Delete topic_answer
 
+    # Delete tag topic
+    tag_topic_s = crud.tag_topic.remove_by_topic_uniq_id(db=db, topic_uniq_id=str(topic_db.t_uniq_id))
+    print(tag_topic_s)
     # Delete topic
-    topic = crud.topic.remove(uniq_id=str(topic_db.t_uniq_id))
+    topic = crud.topic.remove(db=db, uniq_id=str(topic_db.t_uniq_id))
     # topic = crud.topic.remove(db=db, uniq_id="502c462c-ae8c-440e-91dd-6a2ae95aa997")
-
 
     return {"status": "success"}
 

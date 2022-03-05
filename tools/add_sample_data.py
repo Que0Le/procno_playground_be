@@ -283,7 +283,7 @@ for topic in topics:
     # Random number of answer
     num_ans = random.randint(0, 9)
     for na in range(0, num_ans):
-        # Create a ans by 
+        # Create an ans by
         # 1.record 2.read_text 3.commentar
         try:
             topic_owner_id = random.choice(all_users_uniq_id)

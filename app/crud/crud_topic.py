@@ -41,10 +41,10 @@ class CRUDTopic(CRUDBase[TopicDB, TopicCreate, TopicUpdate]):
     ) -> Optional[TopicDB]:
         return (
             db.query(TopicDB)
-                .filter(TopicDB.title == title)
-                .offset(skip)
-                .limit(limit)
-                .all()
+            .filter(TopicDB.title == title)
+            .offset(skip)
+            .limit(limit)
+            .all()
         )
 
     @staticmethod
@@ -53,8 +53,8 @@ class CRUDTopic(CRUDBase[TopicDB, TopicCreate, TopicUpdate]):
     ) -> Optional[TopicDB]:
         return (
             db.query(TopicDB)
-                .filter(TopicDB.title == title)
-                .first()
+            .filter(TopicDB.title == title)
+            .first()
         )
 
     @staticmethod
