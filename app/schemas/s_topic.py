@@ -106,6 +106,21 @@ class TopicQuestionUpdate(TopicQuestionBase):
     uniq_id: str = None
 
 
+class TopicAnswerBase(BaseModel):
+    topic_uniq_id: str = None
+    answer_uniq_id: str = None
+
+
+# Properties to receive via API on creation
+class TopicAnswerCreate(TopicAnswerBase):
+    pass
+
+
+# Properties to receive via API on update
+class TopicAnswerUpdate(TopicAnswerBase):
+    uniq_id: str = None
+
+
 def create_topic_combi_from_db_model(tc: TopicCombiDB = None):
     if tc:
         # print(tc.tt_tag_uuids)

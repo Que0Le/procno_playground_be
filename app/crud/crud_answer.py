@@ -6,9 +6,24 @@ from app.crud.base import CRUDBase
 from app.models.m_answer import AnswerDB, AnswerCombiDB
 from app.schemas.s_answer import AnswerCreate, AnswerUpdate
 from sqlalchemy import text
+from app.models import m_small, m_question, m_answer, m_topic
+from app.schemas import s_small, s_question, s_answer, s_topic
 
 
 class CRUDAnswer(CRUDBase[AnswerDB, AnswerCreate, AnswerUpdate]):
+    @staticmethod
+    def remove_by_uniq_id_s(db: Session, *, uniq_id_s: List[str]) -> int:
+        """
+        Delete multiple answers by uniq_id supplied in uniq_id_s.
+        @param db:
+        @param uniq_id_s:
+        @return: number of rows deleted
+        """
+        nbr_deleted = db.query(m_answer.AnswerDB).filter(
+            m_answer.AnswerDB.uniq_id.in_(uniq_id_s)
+        ).delete()
+        db.commit()
+        return nbr_deleted
 
     @staticmethod
     def get_combi_by_topic_uniq_id(

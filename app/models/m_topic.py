@@ -77,3 +77,13 @@ class TopicQuestionDB(Base):
     created_at = Column(DateTime(), nullable=False)
     updated_at = Column(DateTime(), nullable=False)
 
+
+class TopicAnswerDB(Base):
+    # overwrite the table name
+    __tablename__ = 'topic_answer'
+    id = Column(Integer, autoincrement=True)
+    uniq_id: uuid.UUID = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    topic_uniq_id: uuid.UUID = Column(UUID(as_uuid=True), ForeignKey("users.uniq_id"))
+    answer_uniq_id: uuid.UUID = Column(UUID(as_uuid=True), ForeignKey("answers.uniq_id"))
+    created_at = Column(DateTime(), nullable=False)
+    updated_at = Column(DateTime(), nullable=False)

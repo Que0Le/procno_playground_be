@@ -14,22 +14,13 @@ from sqlalchemy.dialects.postgresql import UUID
 class AnswerDB(Base):
     # overwrite the table name
     __tablename__ = 'answers'
-
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer)
+    uniq_id: uuid.UUID = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     owner_id = Column(Integer, ForeignKey("users.id"))
     commentar_id = Column(Integer, ForeignKey("commentars.id"))
     record_id = Column(Integer, ForeignKey("records.id"))
     created_at = Column(DateTime(), nullable=False)
     updated_at = Column(DateTime(), nullable=False)
-
-    def to_string(self):
-        return str(
-            f"TagDB:\nid[{str(self.id)}]\n\
-            owner_id[{str(self.owner_id)}]\n\
-            commentar_id[{str(self.commentar_id)}]\n\
-            record_id[{str(self.record_id)}]\n\
-            created_at[{str(self.created_at)}]\n\
-            updated_at[{str(self.updated_at)}]")
 
 
 class AnswerCombiDB(Base):

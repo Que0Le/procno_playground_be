@@ -11,9 +11,9 @@ from app.schemas.s_topic import TagAndID
 
 
 class AnswerBase(BaseModel):
-    owner_id: int
-    commentar_id: int
-    record_id: int
+    owner_uniq_id: str
+    commentar_uniq_id: str
+    record_uniq_id: str
 
 
 class AnswerOverviewGet(BaseModel):
@@ -68,7 +68,7 @@ class AnswerCreate(AnswerBase):
 
 # Properties to receive via API on update
 class AnswerUpdate(AnswerBase):
-    pass
+    uniq_id: str
 
 
 class AnswerInDBBase(AnswerBase):

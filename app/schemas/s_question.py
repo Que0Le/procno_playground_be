@@ -7,10 +7,10 @@ from pydantic import BaseModel, EmailStr
 
 
 class QuestionBase(BaseModel):
-    owner_id: int
-    commentar_id: int
-    record_id: int
-    text_id: int
+    owner_uniq_id: str
+    commentar_uniq_id: str
+    record_uniq_id: str
+    text_uniq_id: str
 
 
 # Properties to receive via API on creation

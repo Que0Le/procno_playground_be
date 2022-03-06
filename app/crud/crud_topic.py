@@ -8,9 +8,7 @@ from app.db.queries import *
 from app.models import m_small, m_question, m_answer, m_topic
 from app.schemas import s_small, s_question, s_answer, s_topic
 from app.models.m_topic import TopicDB, TopicCombiDB
-# from app.models.m_answer import AnswerCombiDB
 from app.schemas.topic import TopicCreate, TopicUpdate
-from sqlalchemy import text
 from sqlalchemy import text
 
 
@@ -177,3 +175,50 @@ class CRUDTopicQuestion(CRUDBase[m_topic.TopicQuestionDB, s_small.TagTopicCreate
 
 
 topic_question = CRUDTopicQuestion(m_topic.TopicQuestionDB)
+
+
+class CRUDTopicAnswer(CRUDBase[m_topic.TopicAnswerDB, s_topic.TopicAnswerCreate, s_topic.TopicAnswerUpdate]):
+    # @staticmethod
+    # def create_topic_question_relation(
+    #         db: Session, *, topic_uniq_id: str, question_uniq_id: str
+    # ) -> m_topic.TopicQuestionDB:
+    #     result = db.execute(
+    #         text(queries_topic_question.INSERT_SINGLE),
+    #         {"topic_uniq_id": topic_uniq_id, "question_uniq_id": question_uniq_id}
+    #     )
+    #     db.commit()
+    #     results_as_dict = result.mappings().all()
+    #     topic_question_db = m_topic.TopicQuestionDB(**results_as_dict[0])
+    #     return topic_question_db
+    #
+
+    @staticmethod
+    def remove_by_topic_uniq_id(db: Session, *, topic_uniq_id: str) -> int:
+        """
+        Delete multiple topic_answer by topic uniq_id.
+        @param db:
+        @param topic_uniq_id:
+        @return: number of rows deleted
+        """
+        nbr_deleted = db.query(m_topic.TopicAnswerDB).filter(
+            m_topic.TopicAnswerDB.topic_uniq_id == topic_uniq_id
+        ).delete()
+        db.commit()
+        return nbr_deleted
+
+    @staticmethod
+    def get_multi_by_topic_uniq_id(
+            db: Session, *, topic_uniq_id: str
+    ) -> List[m_topic.TopicAnswerDB]:
+        return (
+            db.query(m_topic.TopicAnswerDB)
+            .filter(m_topic.TopicAnswerDB.topic_uniq_id == topic_uniq_id)
+            # .offset(skip)
+            # .limit(limit)
+            .all()
+        )
+
+
+topic_answer = CRUDTopicAnswer(m_topic.TopicAnswerDB)
+
+
