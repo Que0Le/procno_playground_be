@@ -85,6 +85,8 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER_PASSWORD: str
     USERS_OPEN_REGISTRATION: bool = False
 
+    RECORD_FILENAME_LENGTH = 30
+
     class Config:
         case_sensitive = True
         env_file = ".env"
