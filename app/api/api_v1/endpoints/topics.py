@@ -1,3 +1,4 @@
+import os
 import string
 import random
 from typing import Any, List
@@ -5,10 +6,10 @@ from fastapi import APIRouter, Depends, status, HTTPException, File, Form, Uploa
 from app import models, schemas, crud
 from app.api import deps
 from sqlalchemy.orm import Session
-from datetime import datetime
+# from datetime import datetime
 # from uuid import UUID
-from fastapi import Request
-from fastapi.responses import JSONResponse
+# from fastapi import Request
+# from fastapi.responses import JSONResponse
 from app.core.config import settings
 
 router = APIRouter()
@@ -26,11 +27,11 @@ async def create_file(
 ):
 
     # File sanitize
-    if file.content_type.split("/")[-1] != "webm":
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="File must have content_type audio/webm or video/webm!"
-        )
+    # if file.content_type.split("/")[-1] != "webm":
+    #     raise HTTPException(
+    #         status_code=status.HTTP_400_BAD_REQUEST,
+    #         detail="File must have content_type audio/webm or video/webm!"
+    #     )
     # Generate random file name. TODO: check for duplicated filename in dir!
     filename = ''.join(
         random.SystemRandom().choice(string.ascii_lowercase + string.digits)
@@ -99,7 +100,7 @@ async def create_file(
     )
 
     """ Write file """
-    with open(f"./data/{filename}", "wb+") as f:
+    with open(f"./data/records/{filename}", "wb+") as f:
         f.write(file.file.read())
 
     """ Now try retrieve the recently added topic """
@@ -239,6 +240,8 @@ def delete_topic_and_related_by_uniq_id(
     for rc_uniq_id in rc_uniq_id_s:
         # Delete record
         record = crud.record.remove(db=db, uniq_id=rc_uniq_id)
+        if os.path.isfile("./data/records/" + record.filename):
+            os.remove("./data/records/" + record.filename)
     for c_uniq_id in c_uniq_id_s:
         # Delete commentar
         commentar = crud.commentar.remove(db=db, uniq_id=c_uniq_id)
@@ -252,6 +255,8 @@ def delete_topic_and_related_by_uniq_id(
     question = crud.question.remove(db=db, uniq_id=str(topic_db.q_uniq_id))
     # Delete record
     record = crud.record.remove(db=db, uniq_id=str(topic_db.rc_uniq_id))
+    if os.path.isfile("./data/records/" + record.filename):
+        os.remove("./data/records/" + record.filename)
     # Delete readtext
     read_text = crud.read_text.remove(db=db, uniq_id=str(topic_db.rt_uniq_id))
     # Delete commentar

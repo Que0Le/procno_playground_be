@@ -48,3 +48,17 @@ async def get_dummies_record_by_random(record_filename: str):
     return FileResponse(
         "./data/short_audio_samples/" + random_file
     )
+
+
+@router.get("/record-or-dummy/{record_filename}")
+async def get_record_by_filename_or_random_dummy(record_filename: str):
+    """ Return filename, or a random audio file ("mp3", "wav") in short_audio_samples folder. """
+    if os.path.isfile("./data/records/" + record_filename):
+        return FileResponse("./data/records/" + record_filename)
+
+    """ No file found. Return random file """
+    listdir = os.listdir("./data/short_audio_samples/")
+    listfiles = [item for item in listdir if item.split(".")[-1] in ["mp3", "wav"]]
+    random_file = random.choice(listfiles)
+    # print(listfiles)
+    return FileResponse("./data/short_audio_samples/" + random_file)
