@@ -48,8 +48,9 @@ def login_access_token(
     """
     Same Site - prevents the cookie from being sent in cross-site requests
     HTTP Only - cookies are only accessible from a server
-    Secure - cookie must be transmitted over HTTPS
+    Secure - cookie must be transmitted over HTTPS (or localhost)
     """
+    print(str(settings.COOKIES_SECURE) + str(settings.COOKIES_HTTP_ONLY) + str(settings.COOKIES_SAME_SITE))
     response.set_cookie(
         key="cookie_token",
         value=token,
