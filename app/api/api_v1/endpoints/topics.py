@@ -1,8 +1,8 @@
 import os
 import string
 import random
-from typing import Any, List
-from fastapi import APIRouter, Depends, status, HTTPException, File, Form, UploadFile
+from typing import Any, List, Optional
+from fastapi import APIRouter, Depends, status, HTTPException, File, Form, UploadFile, Cookie
 from app import models, schemas, crud
 from app.api import deps
 from sqlalchemy.orm import Session
@@ -200,10 +200,10 @@ def get_own_topic_overviews(
 
 @router.delete("/uniq_id/{uniq_id}", status_code=status.HTTP_200_OK)
 def delete_topic_and_related_by_uniq_id(
-        *,
-        db: Session = Depends(deps.get_db),
-        # current_user: models.UserDB = Depends(deps.get_current_user),
-        uniq_id: str
+    *,
+    db: Session = Depends(deps.get_db),
+    # current_user: models.UserDB = Depends(deps.get_current_user),
+    uniq_id: str
 ) -> Any:
     """
     Delete topic, including question, answers and related
@@ -273,9 +273,10 @@ def delete_topic_and_related_by_uniq_id(
 
 @router.get("/uniq_id/{uniq_id}", response_model=schemas.TopicOverviewGet, status_code=200)
 def get_topic_overview_by_uniq_id(
-        *,
-        db: Session = Depends(deps.get_db),
-        uniq_id: str
+    *,
+    db: Session = Depends(deps.get_db),
+    uniq_id: str,
+    cookie_name: Optional[str] = Cookie(None)
 ) -> Any:
     """
     Get a topic by its uniq_id

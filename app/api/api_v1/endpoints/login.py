@@ -4,6 +4,8 @@ from typing import Any
 from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from starlette.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 
 from app import crud, models, schemas
 from app.api import deps
@@ -34,14 +36,51 @@ def login_access_token(
     elif not crud.user.is_active(user):
         raise HTTPException(status_code=400, detail="Inactive user")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    return {
-        "access_token": security.create_access_token(
+    token = security.create_access_token(
             user.uniq_id, expires_delta=access_token_expires
-        ),
+        )
+    response = JSONResponse(content={
+        "access_token": token,
         "token_type": "bearer",
         "username": user.username,
         "uniq_id": str(user.uniq_id),
-    }
+    })
+    """
+    Same Site - prevents the cookie from being sent in cross-site requests
+    HTTP Only - cookies are only accessible from a server
+    Secure - cookie must be transmitted over HTTPS
+    """
+    response.set_cookie(
+        key="cookie_token",
+        value=token,
+        max_age=settings.ACCESS_TOKEN_EXPIRE_SECONDS,
+        path=settings.COOKIES_PATH,
+        domain=settings.COOKIES_DOMAIN,
+        secure=settings.COOKIES_SECURE,
+        httponly=settings.COOKIES_HTTP_ONLY,
+        samesite=settings.COOKIES_SAME_SITE,
+    )
+    return response
+
+
+@router.delete("/login/access-token", response_model=schemas.User)
+def remove_token(
+    current_user: models.UserDB = Depends(deps.get_current_user)
+) -> Any:
+    """
+    Delete token-cookie (cookie-based transport),
+    and/or remove token from server's book (header based)
+    """
+    # TODO: remove token from storage
+
+    response = JSONResponse(content=jsonable_encoder(current_user))
+    """
+    Same Site - prevents the cookie from being sent in cross-site requests
+    HTTP Only - cookies are only accessible from a server
+    Secure - cookie must be transmitted over HTTPS
+    """
+    response.delete_cookie(key="cookie_token")
+    return response
 
 
 @router.post("/login/test-token", response_model=schemas.User)

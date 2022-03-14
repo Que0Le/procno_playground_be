@@ -1,7 +1,8 @@
-from typing import Generator
+from typing import Generator, Optional
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Cookie, Request
 from fastapi.security import OAuth2PasswordBearer
+from fastapi.security.utils import get_authorization_scheme_param
 from jose import jwt
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
@@ -24,8 +25,33 @@ def get_db() -> Generator:
         db.close()
 
 
+def get_token_from_transports(
+        request: Request,
+        cookie_token: Optional[str] = Cookie(None),
+) -> str:
+    """
+    Get token from request.
+    There are 2 ways of transporting token that we support:
+    Per header, or per cookie.
+    First success extracting wins.
+    """
+    token: str = ""
+    authorization: str = request.headers.get("Authorization")
+    scheme, param = get_authorization_scheme_param(authorization)
+    if authorization and scheme.lower() == "bearer":
+        return param
+    if cookie_token:
+        return cookie_token
+    if token == "":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+
 def get_current_user(
-    db: Session = Depends(get_db), token: str = Depends(reusable_oauth2)
+    db: Session = Depends(get_db), token: str = Depends(get_token_from_transports)
 ) -> models.UserDB:
     try:
         payload = jwt.decode(
@@ -44,7 +70,7 @@ def get_current_user(
 
 
 def get_current_active_user(
-    current_user: models.UserDB = Depends(get_current_user),
+    current_user: models.UserDB = Depends(get_token_from_transports),
 ) -> models.UserDB:
     if not crud.user.is_active(current_user):
         raise HTTPException(status_code=400, detail="Inactive user")

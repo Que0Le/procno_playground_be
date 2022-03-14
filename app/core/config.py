@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = secrets.token_urlsafe(32)
     # 60 minutes * 24 hours * 8 days = 8 days
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
+    ACCESS_TOKEN_EXPIRE_SECONDS: int = ACCESS_TOKEN_EXPIRE_MINUTES * 60
     SERVER_NAME: str
     SERVER_HOST: AnyHttpUrl
     # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins
@@ -86,6 +87,14 @@ class Settings(BaseSettings):
     USERS_OPEN_REGISTRATION: bool = False
 
     RECORD_FILENAME_LENGTH = 30
+
+    """ Token with Cookies as transport """
+    COOKIES_MAX_AGE = ACCESS_TOKEN_EXPIRE_SECONDS
+    COOKIES_PATH = "/"
+    COOKIES_DOMAIN: bool = None
+    COOKIES_SECURE: bool = True
+    COOKIES_HTTP_ONLY: bool = True
+    COOKIES_SAME_SITE: str = "Strict"
 
     class Config:
         case_sensitive = True
