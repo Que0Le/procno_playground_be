@@ -26,18 +26,23 @@ def create_access_token(
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
+
 def generate_salt() -> str:
     return bcrypt.gensalt().decode()
+
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     # Plain password should be "salt+password"
     return pwd_context.verify(plain_password, hashed_password)
 
+
 def get_password_hash(password: str) -> str:
     # Password should be "salt+password"
     return pwd_context.hash(password)
+
 
 # TODO: create logout function
 # The token is saved client side, therefore server can not log the user out by
 # deleting token. Instead, server can maintain a blacklist of token that is
 # considered "not valid". But how to know which token belongs to a user?
+

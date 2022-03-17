@@ -26,8 +26,8 @@ def get_db() -> Generator:
 
 
 def get_token_from_transports(
-        request: Request,
-        cookie_token: Optional[str] = Cookie(None),
+    request: Request,
+    procno_cookie_token: Optional[str] = Cookie(None),
 ) -> str:
     """
     Get token from request.
@@ -38,12 +38,12 @@ def get_token_from_transports(
     token: str = ""
     authorization: str = request.headers.get("Authorization")
     scheme, param = get_authorization_scheme_param(authorization)
-    # print("bearer: " + str(param))
-    # print("cookie: " + str(cookie_token))
+    print("bearer: " + str(param))
+    print("cookie: " + str(procno_cookie_token))
     if authorization and scheme.lower() == "bearer":
         return param
-    if cookie_token:
-        return cookie_token
+    if procno_cookie_token:
+        return procno_cookie_token
     if token == "":
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -53,7 +53,8 @@ def get_token_from_transports(
 
 
 def get_current_user(
-    db: Session = Depends(get_db), token: str = Depends(get_token_from_transports)
+    db: Session = Depends(get_db),
+    token: str = Depends(get_token_from_transports),
 ) -> models.UserDB:
     try:
         payload = jwt.decode(

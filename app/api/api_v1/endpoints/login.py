@@ -1,8 +1,9 @@
-from datetime import timedelta
-from typing import Any
+from datetime import datetime, timedelta
+from typing import Any, Optional
 
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import EmailStr
 from sqlalchemy.orm import Session
 from starlette.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
@@ -21,9 +22,9 @@ from app.utils import (
 router = APIRouter()
 
 
-@router.post("/login/access-token", response_model=schemas.Token)
+@router.post("/login/access-token/", response_model=schemas.Token)
 def login_access_token(
-    db: Session = Depends(deps.get_db), form_data: OAuth2PasswordRequestForm = Depends()
+        db: Session = Depends(deps.get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ) -> Any:
     """
     OAuth2 compatible token login, get an access token for future requests
@@ -37,22 +38,23 @@ def login_access_token(
         raise HTTPException(status_code=400, detail="Inactive user")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     token = security.create_access_token(
-            user.uniq_id, expires_delta=access_token_expires
-        )
+        user.uniq_id, expires_delta=access_token_expires
+    )
     response = JSONResponse(content={
         "access_token": token,
         "token_type": "bearer",
         "username": user.username,
         "uniq_id": str(user.uniq_id),
     })
+    print(access_token_expires)
     """
-    Same Site - prevents the cookie from being sent in cross-site requests
+    Secure - cookie must be transmitted over HTTPS
     HTTP Only - cookies are only accessible from a server
-    Secure - cookie must be transmitted over HTTPS (or localhost)
+    Same Site - prevents the cookie from being sent in cross-site requests
     """
     print(str(settings.COOKIES_SECURE) + str(settings.COOKIES_HTTP_ONLY) + str(settings.COOKIES_SAME_SITE))
     response.set_cookie(
-        key="cookie_token",
+        key="procno_cookie_token",
         value=token,
         max_age=settings.ACCESS_TOKEN_EXPIRE_SECONDS,
         path=settings.COOKIES_PATH,
@@ -61,12 +63,24 @@ def login_access_token(
         httponly=settings.COOKIES_HTTP_ONLY,
         samesite=settings.COOKIES_SAME_SITE,
     )
+    response.set_cookie(
+        key="procno_token_expiration",
+        value=str(
+            datetime.now() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        ).split(".")[0].replace("-", "_").replace(":", "_").replace(" ", "___"),
+        max_age=settings.ACCESS_TOKEN_EXPIRE_SECONDS,
+        path=settings.COOKIES_PATH,
+        domain=settings.COOKIES_DOMAIN,
+        secure=settings.COOKIES_SECURE,
+        httponly=False,
+        samesite=settings.COOKIES_SAME_SITE,
+    )
     return response
 
 
-@router.delete("/login/access-token", response_model=schemas.User)
+@router.delete("/login/access-token/")
 def remove_token(
-    current_user: models.UserDB = Depends(deps.get_current_user)
+        current_user: models.UserDB = Depends(deps.get_current_user)
 ) -> Any:
     """
     Delete token-cookie (cookie-based transport),
@@ -74,13 +88,25 @@ def remove_token(
     """
     # TODO: remove token from storage
 
-    response = JSONResponse(content=jsonable_encoder(current_user))
+    content = {"status": "success"}
+    if current_user:
+        content["current_user"] = jsonable_encoder(
+            schemas.User(
+                id=current_user.id,
+                email=EmailStr(current_user.email),
+                username=current_user.username,
+                is_active=current_user.is_active,
+            )
+        )
+    response = JSONResponse(content=content)
     """
     Same Site - prevents the cookie from being sent in cross-site requests
     HTTP Only - cookies are only accessible from a server
     Secure - cookie must be transmitted over HTTPS
     """
-    response.delete_cookie(key="cookie_token")
+    response.delete_cookie(key="procno_cookie_token")
+    response.delete_cookie(key="procno_token_expiration")
+    response.status_code = status.HTTP_200_OK
     return response
 
 
@@ -113,9 +139,9 @@ def recover_password(email: str, db: Session = Depends(deps.get_db)) -> Any:
 
 @router.post("/reset-password/", response_model=schemas.Msg)
 def reset_password(
-    token: str = Body(...),
-    new_password: str = Body(...),
-    db: Session = Depends(deps.get_db),
+        token: str = Body(...),
+        new_password: str = Body(...),
+        db: Session = Depends(deps.get_db),
 ) -> Any:
     """
     Reset password
