@@ -46,7 +46,7 @@ def login_access_token(
         "username": user.username,
         "uniq_id": str(user.uniq_id),
     })
-    print(access_token_expires)
+
     """
     Secure - cookie must be transmitted over HTTPS
     HTTP Only - cookies are only accessible from a server

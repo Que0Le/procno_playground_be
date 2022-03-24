@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="run8888" type="Python.FastAPI">
-    <option name="additionalOptions" value="--reload --host 0.0.0.0 --port 8888" />
+    <option name="additionalOptions" value="--reload --host 0.0.0.0 --port 8888 --ssl-keyfile=../localhost+2-key.pem --ssl-certfile=../localhost+2.pem" />
     <option name="file" value="$PROJECT_DIR$/app/main.py" />
     <module name="procno_playground_be" />
     <option name="INTERPRETER_OPTIONS" value="" />

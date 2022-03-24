@@ -22,6 +22,7 @@ python add_sample_data.py
 
 # start the server
 uvicorn app.main:app --host 0.0.0.0 --port 8888
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8888 --ssl-keyfile=../localhost+2-key.pem --ssl-certfile=../localhost+2.pem
 ```
 
 BIG TODO:
