@@ -1,6 +1,7 @@
+import os
 from typing import Any, List
 
-from fastapi import APIRouter, Depends, status, Form, UploadFile, File
+from fastapi import APIRouter, Depends, status, Form, UploadFile, File, HTTPException
 # from pydantic.networks import EmailStr
 import random
 import string
@@ -13,6 +14,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 
 from app.core.config import settings
+from app.schemas import s_answer
 from app.schemas.s_topic import TopicGet
 from uuid import UUID
 
@@ -86,6 +88,56 @@ async def create_new_answer(
     return {
         "status": "success",
         "answer_combi": answer_combi_db
+    }
+
+
+@router.delete("/own-answers/{uniq_id}", status_code=status.HTTP_201_CREATED)
+async def delete_own_answer_by_uniq_id(
+        *,
+        db: Session = Depends(deps.get_db),
+        current_user: models.UserDB = Depends(deps.get_current_user),
+        uniq_id: str,
+) -> Any:
+
+    # Get the combi from DB first
+    answer_combi_db = crud.answer.get_combi_by_uniq_id(
+        db=db, answer_uniq_id=uniq_id
+    )
+    if not answer_combi_db:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Answer not found!"
+        )
+    if answer_combi_db.u_uniq_id != current_user.uniq_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not own answer!"
+        )
+    # Stupid db cursor: answer_combi_db will be invalid when
+    # next expression that requires cursor gets executed.
+    # Solution: create copies of data.
+    answer_combi = s_answer.create_answer_combi_from_db_model(answer_combi_db)
+
+    # Remove from topic_answer
+    nbr_topic_answer_deleted = crud.topic_answer.remove_by_answer_uniq_id(
+        db=db, answer_uniq_id=uniq_id
+    )
+    # Remove from answers
+    nbr_answers_deleted = crud.answer.remove_by_uniq_id_s(
+        db=db, uniq_id_s=[uniq_id]
+    )
+    # Remove from commentars
+    deleted_commentar = crud.commentar.remove(
+        db=db, uniq_id=answer_combi.commentar_uniq_id
+    )
+    # Remove from records
+    record_db = crud.record.remove(db=db, uniq_id=answer_combi.record_uniq_id)
+    if os.path.isfile("./data/records/" + record_db.filename):
+        os.remove("./data/records/" + record_db.filename)
+
+    return {
+        "status": "success",
+        "answer_combi": answer_combi
     }
 
 

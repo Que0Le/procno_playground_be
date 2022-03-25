@@ -206,6 +206,20 @@ class CRUDTopicAnswer(CRUDBase[m_topic.TopicAnswerDB, s_topic.TopicAnswerCreate,
         return nbr_deleted
 
     @staticmethod
+    def remove_by_answer_uniq_id(db: Session, *, answer_uniq_id: str) -> int:
+        """
+        Delete 1 topic_answer by answer uniq_id.
+        @param db:
+        @param answer_uniq_id:
+        @return: number of rows deleted. Should be 1
+        """
+        nbr_deleted = db.query(m_topic.TopicAnswerDB).filter(
+            m_topic.TopicAnswerDB.answer_uniq_id == answer_uniq_id
+        ).delete()
+        db.commit()
+        return nbr_deleted
+
+    @staticmethod
     def get_multi_by_topic_uniq_id(
             db: Session, *, topic_uniq_id: str
     ) -> List[m_topic.TopicAnswerDB]:

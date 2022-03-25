@@ -17,20 +17,20 @@ class AnswerBase(BaseModel):
 
 
 class AnswerOverviewGet(BaseModel):
-    answer_uniq_id: UUID
+    answer_uniq_id: str
     answer_created_at: datetime
     answer_updated_at: datetime
     #
-    user_uniq_id: UUID
+    user_uniq_id: str
     user_username: str
     user_created_date: datetime
     #
-    commentar_uniq_id: UUID
+    commentar_uniq_id: str
     commentar: str
     commentar_created_at: datetime
     commentar_updated_at: datetime
     #
-    record_uniq_id: UUID
+    record_uniq_id: str
     record_filename: str
     record_created_at: datetime
     record_updated_at: datetime
@@ -63,7 +63,7 @@ def create_answer_combi_from_db_model(ac: AnswerCombiDB = None):
 
 # Properties to receive via API on creation
 class AnswerCreate(AnswerBase):
-    topic_uniq_id: UUID
+    topic_uniq_id: str
     pass
 
 

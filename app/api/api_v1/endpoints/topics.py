@@ -214,7 +214,12 @@ def delete_topic_and_related_by_uniq_id(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Topic not found!"
         )
+
+    # Stupid db cursor: answer_combi_db will be invalid when
+    # next expression that requires cursor gets executed.
+    # Solution: create copies of data.
     topic_get = schemas.create_topic_combi_from_db_model(topic_db)
+
     # if str(topic_db.u_uniq_id) != str(current_user.uniq_id):
     #     raise HTTPException(
     #         status_code=status.HTTP_401_UNAUTHORIZED,
