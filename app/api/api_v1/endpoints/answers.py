@@ -7,16 +7,11 @@ import random
 import string
 from app import models, schemas, crud
 from app.api import deps
-# from app.core.celery_app import celery_app
 # from app.schemas.s_topic import TopicOverviewGet
-# from app.utils import send_test_email
 from sqlalchemy.orm import Session
 from datetime import datetime
-
 from app.core.config import settings
 from app.schemas import s_answer
-from app.schemas.s_topic import TopicGet
-from uuid import UUID
 
 router = APIRouter()
 
