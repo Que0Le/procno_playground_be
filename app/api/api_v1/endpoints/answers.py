@@ -31,14 +31,14 @@ def get_own_answers(
     return {}
 
 
-@router.post("/answers/", status_code=status.HTTP_201_CREATED)
+@router.post("/own-answers/", status_code=status.HTTP_201_CREATED)
 async def create_new_answer(
         *,
         db: Session = Depends(deps.get_db),
         current_user: models.UserDB = Depends(deps.get_current_user),
         file: UploadFile = File(...), topic_uniq_id: str = Form(...),
         commentar: str = Form(...),
-):
+) -> Any:
 
     # File sanitize
     # if file.content_type.split("/")[-1] != "webm":
@@ -80,13 +80,12 @@ async def create_new_answer(
     with open(f"./data/records/{filename}", "wb+") as f:
         f.write(file.file.read())
 
-    """ Now try retrieve the recently added topic """
-    topic_db = crud.topic.get_combi_by_topic_uniq_id(db=db, topic_uniq_id=topic_db.uniq_id)
-    topic_get = schemas.create_topic_combi_from_db_model(topic_db)
+    """ Now try retrieve the combi for recently added answer """
+    answer_combi_db = crud.answer.get_combi_by_uniq_id(db=db, answer_uniq_id=answer_db.uniq_id)
 
     return {
         "status": "success",
-        "topic": topic_get
+        "answer_combi": answer_combi_db
     }
 
 

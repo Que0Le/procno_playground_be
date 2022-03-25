@@ -183,7 +183,7 @@ class CRUDTopicAnswer(CRUDBase[m_topic.TopicAnswerDB, s_topic.TopicAnswerCreate,
             db: Session, *, topic_uniq_id: str, answer_uniq_id: str
     ) -> m_topic.TopicAnswerDB:
         result = db.execute(
-            text(queries_topic_question.INSERT_SINGLE),
+            text(queries_topic_answer.INSERT_SINGLE),
             {"topic_uniq_id": topic_uniq_id, "answer_uniq_id": answer_uniq_id}
         )
         db.commit()

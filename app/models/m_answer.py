@@ -16,9 +16,9 @@ class AnswerDB(Base):
     __tablename__ = 'answers'
     id = Column(Integer)
     uniq_id: uuid.UUID = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    owner_id = Column(Integer, ForeignKey("users.id"))
-    commentar_id = Column(Integer, ForeignKey("commentars.id"))
-    record_id = Column(Integer, ForeignKey("records.id"))
+    owner_uniq_id = Column(Integer, ForeignKey("users.uniq_id"))
+    commentar_uniq_id = Column(Integer, ForeignKey("commentars.uniq_id"))
+    record_uniq_id = Column(Integer, ForeignKey("records.uniq_id"))
     created_at = Column(DateTime(), nullable=False)
     updated_at = Column(DateTime(), nullable=False)
 
