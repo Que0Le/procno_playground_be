@@ -3,6 +3,7 @@ from typing import Optional, List
 from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
+from app.db.queries import queries_answer
 from app.models.m_answer import AnswerDB, AnswerCombiDB
 from app.schemas.s_answer import AnswerCreate, AnswerUpdate
 from sqlalchemy import text
@@ -11,6 +12,23 @@ from app.schemas import s_small, s_question, s_answer, s_topic
 
 
 class CRUDAnswer(CRUDBase[AnswerDB, AnswerCreate, AnswerUpdate]):
+    @staticmethod
+    def create_answer(
+            db: Session, *, owner_uniq_id: str, commentar_uniq_id: str, record_uniq_id: str,
+    ) -> m_answer.AnswerDB:
+        result = db.execute(
+            text(queries_answer.INSERT_SINGLE),
+            {
+                "owner_uniq_id": owner_uniq_id,
+                "commentar_uniq_id": commentar_uniq_id,
+                "record_uniq_id": record_uniq_id,
+            }
+        )
+        db.commit()
+        results_as_dict = result.mappings().all()
+        answer_db = m_answer.AnswerDB(**results_as_dict[0])
+        return answer_db
+
     @staticmethod
     def remove_by_uniq_id_s(db: Session, *, uniq_id_s: List[str]) -> int:
         """

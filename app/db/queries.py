@@ -88,7 +88,16 @@ class QueryQuestion:
     """
 
 
-queries_question = QueryQuestion
+class QueryAnswer:
+    INSERT_SINGLE = """
+    insert into public.answers 
+    (owner_uniq_id, commentar_uniq_id, record_uniq_id) 
+    values (:owner_uniq_id, :commentar_uniq_id, :record_uniq_id) 
+    returning *
+    """
+
+
+queries_answer = QueryAnswer
 
 
 class QueryTopicAnswer:

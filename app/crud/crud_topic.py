@@ -178,19 +178,18 @@ topic_question = CRUDTopicQuestion(m_topic.TopicQuestionDB)
 
 
 class CRUDTopicAnswer(CRUDBase[m_topic.TopicAnswerDB, s_topic.TopicAnswerCreate, s_topic.TopicAnswerUpdate]):
-    # @staticmethod
-    # def create_topic_question_relation(
-    #         db: Session, *, topic_uniq_id: str, question_uniq_id: str
-    # ) -> m_topic.TopicQuestionDB:
-    #     result = db.execute(
-    #         text(queries_topic_question.INSERT_SINGLE),
-    #         {"topic_uniq_id": topic_uniq_id, "question_uniq_id": question_uniq_id}
-    #     )
-    #     db.commit()
-    #     results_as_dict = result.mappings().all()
-    #     topic_question_db = m_topic.TopicQuestionDB(**results_as_dict[0])
-    #     return topic_question_db
-    #
+    @staticmethod
+    def create_topic_answer_relation(
+            db: Session, *, topic_uniq_id: str, answer_uniq_id: str
+    ) -> m_topic.TopicAnswerDB:
+        result = db.execute(
+            text(queries_topic_question.INSERT_SINGLE),
+            {"topic_uniq_id": topic_uniq_id, "answer_uniq_id": answer_uniq_id}
+        )
+        db.commit()
+        results_as_dict = result.mappings().all()
+        topic_answer_db = m_topic.TopicAnswerDB(**results_as_dict[0])
+        return topic_answer_db
 
     @staticmethod
     def remove_by_topic_uniq_id(db: Session, *, topic_uniq_id: str) -> int:

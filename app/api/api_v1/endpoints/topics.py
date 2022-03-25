@@ -16,7 +16,7 @@ router = APIRouter()
 
 
 @router.post("/own-topics/", status_code=status.HTTP_201_CREATED)
-async def create_file(
+async def create_new_topic(
         *,
         db: Session = Depends(deps.get_db),
         current_user: models.UserDB = Depends(deps.get_current_user),

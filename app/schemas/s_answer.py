@@ -63,6 +63,7 @@ def create_answer_combi_from_db_model(ac: AnswerCombiDB = None):
 
 # Properties to receive via API on creation
 class AnswerCreate(AnswerBase):
+    topic_uniq_id: UUID
     pass
 
 
