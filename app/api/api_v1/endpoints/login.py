@@ -52,7 +52,7 @@ def login_access_token(
     HTTP Only - cookies are only accessible from a server
     Same Site - prevents the cookie from being sent in cross-site requests
     """
-    print(str(settings.COOKIES_SECURE) + str(settings.COOKIES_HTTP_ONLY) + str(settings.COOKIES_SAME_SITE))
+    # print(str(settings.COOKIES_SECURE) + str(settings.COOKIES_HTTP_ONLY) + str(settings.COOKIES_SAME_SITE))
     response.set_cookie(
         key="procno_cookie_token",
         value=token,

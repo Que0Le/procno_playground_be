@@ -86,7 +86,7 @@ async def create_new_answer(
     }
 
 
-@router.delete("/own-answers/{uniq_id}", status_code=status.HTTP_201_CREATED)
+@router.delete("/own-answers/{uniq_id}", status_code=status.HTTP_200_OK)
 async def delete_own_answer_by_uniq_id(
         *,
         db: Session = Depends(deps.get_db),

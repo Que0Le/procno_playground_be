@@ -38,8 +38,8 @@ def get_token_from_transports(
     token: str = ""
     authorization: str = request.headers.get("Authorization")
     scheme, param = get_authorization_scheme_param(authorization)
-    print("bearer: " + str(param))
-    print("cookie: " + str(procno_cookie_token))
+    # print("bearer: " + str(param))
+    # print("cookie: " + str(procno_cookie_token))
     if authorization and scheme.lower() == "bearer":
         return param
     if procno_cookie_token:
