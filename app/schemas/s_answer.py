@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from uuid import UUID
 from datetime import datetime
 
-from app.models import AnswerCombiDB
+from app.models.m_answer import AnswerCombiDB
 from app.schemas.s_topic import TagAndID
 
 """ Answer """

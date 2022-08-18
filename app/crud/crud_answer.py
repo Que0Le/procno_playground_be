@@ -72,4 +72,4 @@ class CRUDAnswer(CRUDBase[AnswerDB, AnswerCreate, AnswerUpdate]):
         )
 
 
-answer = CRUDAnswer(AnswerDB)
+crud_answer = CRUDAnswer(AnswerDB)

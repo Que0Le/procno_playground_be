@@ -9,7 +9,7 @@ app = FastAPI(
     title=settings.PROJECT_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json"
 )
 
-app.mount("/static", StaticFiles(directory="./data/static"), name="static")
+# app.mount("/static", StaticFiles(directory=f"{settings.DATA_PATH}/static"), name="static")
 
 # Set all CORS enabled origins
 if settings.BACKEND_CORS_ORIGINS:

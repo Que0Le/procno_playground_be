@@ -22,7 +22,7 @@ class CRUDTag(CRUDBase[m_small.TagDB, s_small.TagCreate, s_small.TagUpdate]):
         return tag_db
 
 
-tag = CRUDTag(m_small.TagDB)
+crud_tag = CRUDTag(m_small.TagDB)
 
 
 class CRUDTagTopic(CRUDBase[m_small.TagTopicDB, s_small.TagTopicCreate, s_small.TagTopicUpdate]):
@@ -47,7 +47,7 @@ class CRUDTagTopic(CRUDBase[m_small.TagTopicDB, s_small.TagTopicCreate, s_small.
         return obj
 
 
-tag_topic = CRUDTagTopic(m_small.TagTopicDB)
+crud_tag_topic = CRUDTagTopic(m_small.TagTopicDB)
 
 
 class CRUDRecord(CRUDBase[m_small.RecordDB, s_small.RecordCreate, s_small.RecordUpdate]):
@@ -65,7 +65,7 @@ class CRUDRecord(CRUDBase[m_small.RecordDB, s_small.RecordCreate, s_small.Record
         return record_db
 
 
-record = CRUDRecord(m_small.RecordDB)
+crud_record = CRUDRecord(m_small.RecordDB)
 
 
 class CRUDReadText(CRUDBase[m_small.ReadTextDB, s_small.ReadTextCreate, s_small.ReadTextUpdate]):
@@ -83,7 +83,7 @@ class CRUDReadText(CRUDBase[m_small.ReadTextDB, s_small.ReadTextCreate, s_small.
         return read_text_db
 
 
-read_text = CRUDReadText(m_small.ReadTextDB)
+crud_read_text = CRUDReadText(m_small.ReadTextDB)
 
 
 class CRUDCommentar(CRUDBase[m_small.CommentarDB, s_small.CommentarCreate, s_small.CommentarUpdate]):
@@ -101,4 +101,4 @@ class CRUDCommentar(CRUDBase[m_small.CommentarDB, s_small.CommentarCreate, s_sma
         return commentar_db
 
 
-commentar = CRUDCommentar(m_small.CommentarDB)
+crud_commentar = CRUDCommentar(m_small.CommentarDB)

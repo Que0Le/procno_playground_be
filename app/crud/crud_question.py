@@ -45,7 +45,7 @@ class CRUDQuestion(CRUDBase[m_question.QuestionDB, s_question.QuestionCreate, s_
         return result
 
 
-question = CRUDQuestion(m_question.QuestionDB)
+crud_question = CRUDQuestion(m_question.QuestionDB)
 
 
 # class CRUDTopicQuestion(CRUDBase[m_topic.TopicQuestionDB, s_topic.TopicQuestionCreate, s_topic.TopicQuestionUpdate]):

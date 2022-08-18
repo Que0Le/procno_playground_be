@@ -8,7 +8,7 @@ from app.db.queries import *
 from app.models import m_small, m_question, m_answer, m_topic
 from app.schemas import s_small, s_question, s_answer, s_topic
 from app.models.m_topic import TopicDB, TopicCombiDB
-from app.schemas.topic import TopicCreate, TopicUpdate
+from app.schemas.s_topic import TopicCreate, TopicUpdate
 from sqlalchemy import text
 
 
@@ -149,7 +149,7 @@ class CRUDTopic(CRUDBase[TopicDB, TopicCreate, TopicUpdate]):
     #     return super().update(db, db_obj=db_obj, obj_in=update_data)
 
 
-topic = CRUDTopic(TopicDB)
+crud_topic = CRUDTopic(TopicDB)
 
 
 class CRUDTopicQuestion(CRUDBase[m_topic.TopicQuestionDB, s_small.TagTopicCreate, s_small.TagTopicUpdate]):
@@ -174,7 +174,7 @@ class CRUDTopicQuestion(CRUDBase[m_topic.TopicQuestionDB, s_small.TagTopicCreate
         return obj
 
 
-topic_question = CRUDTopicQuestion(m_topic.TopicQuestionDB)
+crud_topic_question = CRUDTopicQuestion(m_topic.TopicQuestionDB)
 
 
 class CRUDTopicAnswer(CRUDBase[m_topic.TopicAnswerDB, s_topic.TopicAnswerCreate, s_topic.TopicAnswerUpdate]):
@@ -232,6 +232,6 @@ class CRUDTopicAnswer(CRUDBase[m_topic.TopicAnswerDB, s_topic.TopicAnswerCreate,
         )
 
 
-topic_answer = CRUDTopicAnswer(m_topic.TopicAnswerDB)
+crud_topic_answer = CRUDTopicAnswer(m_topic.TopicAnswerDB)
 
 

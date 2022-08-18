@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 
 from app.core.security import generate_salt, get_password_hash, verify_password
 from app.crud.base import CRUDBase
-from app.models.user import UserDB
-from app.schemas.user import UserCreate, UserUpdate
+from app.models.m_user import UserDB
+from app.schemas.s_user import UserCreate, UserUpdate
 
 
 class CRUDUser(CRUDBase[UserDB, UserCreate, UserUpdate]):
@@ -58,4 +58,4 @@ class CRUDUser(CRUDBase[UserDB, UserCreate, UserUpdate]):
         return False
 
 
-user = CRUDUser(UserDB)
+crud_user = CRUDUser(UserDB)

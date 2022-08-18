@@ -1,17 +1,21 @@
 import os
 from typing import Any, List
-
-from fastapi import APIRouter, Depends, status, Form, UploadFile, File, HTTPException
-# from pydantic.networks import EmailStr
+from datetime import datetime
 import random
 import string
-from app import models, schemas, crud
-from app.api import deps
-# from app.schemas.s_topic import TopicOverviewGet
+
+from fastapi import APIRouter, Depends, status, Form, UploadFile, File, HTTPException
 from sqlalchemy.orm import Session
-from datetime import datetime
+from app.crud import crud_answer, crud_small, crud_topic
+
+from app.models import *
+from app.models import m_user
+from app.schemas import *
+from app.crud import *
+from app.api import deps
 from app.core.config import settings
 from app.schemas import s_answer
+
 
 router = APIRouter()
 
@@ -20,7 +24,7 @@ router = APIRouter()
 @router.get("/own-answers/")
 def get_own_answers(
     db: Session = Depends(deps.get_db),
-    current_user: models.UserDB = Depends(deps.get_current_user),
+    current_user: m_user.UserDB = Depends(deps.get_current_user),
 ) -> Any:
     """
     Get topic overviews created by current user
@@ -32,7 +36,7 @@ def get_own_answers(
 async def create_new_answer(
         *,
         db: Session = Depends(deps.get_db),
-        current_user: models.UserDB = Depends(deps.get_current_user),
+        current_user: m_user.UserDB = Depends(deps.get_current_user),
         file: UploadFile = File(...), topic_uniq_id: str = Form(...),
         commentar: str = Form(...),
 ) -> Any:
@@ -52,23 +56,23 @@ async def create_new_answer(
     """ Write new answer to DB """
 
     # Add record
-    record_db = crud.record.create_record(
+    record_db = crud_small.crud_record.create_record(
         db=db,
         filename=filename, owner_uniq_id=current_user.uniq_id
     )
     # Add commentar
-    commentar_db = crud.commentar.create_commentar(
+    commentar_db = crud_small.crud_commentar.create_commentar(
         db=db,
         commentar_from_user=commentar, owner_uniq_id=current_user.uniq_id
     )
 
     # Add question and relation with topic
-    answer_db = crud.answer.create_answer(
+    answer_db = crud_answer.crud_answer.create_answer(
         db=db,
         owner_uniq_id=current_user.uniq_id, commentar_uniq_id=commentar_db.uniq_id,
         record_uniq_id=record_db.uniq_id
     )
-    topic_answer_db = crud.topic_answer.create_topic_answer_relation(
+    topic_answer_db = crud_topic.crud_topic_answer.create_topic_answer_relation(
         db=db,
         topic_uniq_id=topic_uniq_id, answer_uniq_id=answer_db.uniq_id
     )
@@ -78,7 +82,7 @@ async def create_new_answer(
         f.write(file.file.read())
 
     """ Now try retrieve the combi for recently added answer """
-    answer_combi_db = crud.answer.get_combi_by_uniq_id(db=db, answer_uniq_id=answer_db.uniq_id)
+    answer_combi_db = crud_answer.crud_answer.get_combi_by_uniq_id(db=db, answer_uniq_id=answer_db.uniq_id)
 
     return {
         "status": "success",
@@ -90,12 +94,12 @@ async def create_new_answer(
 async def delete_own_answer_by_uniq_id(
         *,
         db: Session = Depends(deps.get_db),
-        current_user: models.UserDB = Depends(deps.get_current_user),
+        current_user: m_user.UserDB = Depends(deps.get_current_user),
         uniq_id: str,
 ) -> Any:
 
     # Get the combi from DB first
-    answer_combi_db = crud.answer.get_combi_by_uniq_id(
+    answer_combi_db = crud_answer.crud_answer.get_combi_by_uniq_id(
         db=db, answer_uniq_id=uniq_id
     )
     if not answer_combi_db:
@@ -114,19 +118,19 @@ async def delete_own_answer_by_uniq_id(
     answer_combi = s_answer.create_answer_combi_from_db_model(answer_combi_db)
 
     # Remove from topic_answer
-    nbr_topic_answer_deleted = crud.topic_answer.remove_by_answer_uniq_id(
+    nbr_topic_answer_deleted = crud_topic.crud_topic_answer.remove_by_answer_uniq_id(
         db=db, answer_uniq_id=uniq_id
     )
     # Remove from answers
-    nbr_answers_deleted = crud.answer.remove_by_uniq_id_s(
+    nbr_answers_deleted = crud_answer.crud_answer.remove_by_uniq_id_s(
         db=db, uniq_id_s=[uniq_id]
     )
     # Remove from commentars
-    deleted_commentar = crud.commentar.remove(
+    deleted_commentar = crud_small.crud_commentar.remove(
         db=db, uniq_id=answer_combi.commentar_uniq_id
     )
     # Remove from records
-    record_db = crud.record.remove(db=db, uniq_id=answer_combi.record_uniq_id)
+    record_db = crud_small.crud_record.remove(db=db, uniq_id=answer_combi.record_uniq_id)
     if os.path.isfile("./data/records/" + record_db.filename):
         os.remove("./data/records/" + record_db.filename)
 
@@ -138,7 +142,7 @@ async def delete_own_answer_by_uniq_id(
 
 @router.get(
     "/for-topic/{topic_uniq_id}",
-    response_model=List[schemas.s_answer.AnswerOverviewGet],
+    response_model=List[s_answer.AnswerOverviewGet],
     status_code=200
 )
 def get_topic_overview_by_uniq_id(
@@ -149,10 +153,10 @@ def get_topic_overview_by_uniq_id(
     """
     Get a topic by its uniq_id
     """
-    answers_db = crud.answer.get_combi_by_topic_uniq_id(db=db, topic_uniq_id=topic_uniq_id)
+    answers_db = crud_answer.crud_answer.get_combi_by_topic_uniq_id(db=db, topic_uniq_id=topic_uniq_id)
     answers_get = []
     for answer_db in answers_db:
-        temp = schemas.s_answer.create_answer_combi_from_db_model(answer_db)
+        temp = s_answer.create_answer_combi_from_db_model(answer_db)
         if temp:
             answers_get.append(temp)
     return answers_get

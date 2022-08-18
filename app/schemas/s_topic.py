@@ -91,6 +91,24 @@ class TopicCreate(BaseModel):
     commentar: str
 
 
+class TopicUpdate(BaseModel):
+    topic_title: str
+    source_language: str
+    source_level: str
+    wish_correct_languages: List[str]
+    #
+    owner_uniq_id: str
+    owner_username: str
+    #
+    tags: List[str]
+    #
+    readtext: str
+    #
+    record_filename: str
+    #
+    commentar: str
+
+
 class TopicQuestionBase(BaseModel):
     topic_uniq_id: str = None
     question_uniq_id: str = None

@@ -6,11 +6,18 @@ from fastapi.security.utils import get_authorization_scheme_param
 from jose import jwt
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
+from app.crud import crud_user
+from app.crud.crud_user import CRUDUser
 
-from app import crud, models, schemas
+# from app import crud, models, schemas
+from app.models import *
+from app.schemas import *
+from app.crud import *
+# , models, schemas
 from app.core import security
 from app.core.config import settings
 from app.db.session import SessionLocal
+from app.models import m_user
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/login/access-token"
@@ -55,27 +62,27 @@ def get_token_from_transports(
 def get_current_user(
     db: Session = Depends(get_db),
     token: str = Depends(get_token_from_transports),
-) -> models.UserDB:
+) -> m_user.UserDB:
     try:
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
         )
-        token_data = schemas.TokenPayload(**payload)
+        token_data = token.TokenPayload(**payload)
     except (jwt.JWTError, ValidationError):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
         )
-    user = crud.user.get(db, uniq_id=token_data.sub)
+    user = crud_user.get(db, uniq_id=token_data.sub)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
 
 def get_current_active_user(
-    current_user: models.UserDB = Depends(get_token_from_transports),
-) -> models.UserDB:
-    if not crud.user.is_active(current_user):
+    current_user: m_user.UserDB = Depends(get_token_from_transports),
+) -> m_user.UserDB:
+    if not crud_user.is_active(current_user):
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 
