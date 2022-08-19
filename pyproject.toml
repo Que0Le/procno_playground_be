@@ -10,7 +10,6 @@ uvicorn = "^0.11.3"
 python-multipart = "^0.0.5"
 email-validator = "^1.0.5"
 requests = "^2.23.0"
-celery = "^4.4.2"
 passlib = {extras = ["bcrypt"], version = "^1.7.2"}
 tenacity = "^6.1.0"
 pydantic = "^1.4"

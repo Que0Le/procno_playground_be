@@ -5,6 +5,8 @@ from uuid import UUID
 
 
 """ Tags """
+
+
 class TagBase(BaseModel):
     tag_name: str = None
     description: str = None
@@ -35,9 +37,9 @@ class TagTopicUpdate(TagBase):
     uniq_id: str = None
 
 
-
-
 """ Role """
+
+
 class RoleBase(BaseModel):
     role_name: str
     description: str
@@ -55,6 +57,7 @@ class RoleCreate(RoleBase):
 
 # Properties to receive via API on update
 class RoleUpdate(RoleBase):
+    uniq_id: UUID
     pass
 
 
@@ -67,6 +70,8 @@ class RoleInDBBase(RoleBase):
 
 """ UserRole """
 # Shared properties
+
+
 class UserRoleBase(BaseModel):
     user_id: UUID
     role_id: UUID
@@ -121,6 +126,8 @@ class UserRoleInDBBase(UserRoleBase):
 
 
 """ Record """
+
+
 class RecordBase(BaseModel):
     owner_uniq_id: str
     filename: str
@@ -137,6 +144,8 @@ class RecordUpdate(RecordBase):
 
 
 """ ReadText """
+
+
 class ReadTextBase(BaseModel):
     owner_uniq_id: int = None
     read_text: str = None
@@ -153,6 +162,8 @@ class ReadTextUpdate(ReadTextBase):
 
 
 """ Commentar """
+
+
 class CommentarBase(BaseModel):
     owner_uniq_id: int
     read_text: str
@@ -166,5 +177,3 @@ class CommentarCreate(CommentarBase):
 # Properties to receive via API on update
 class CommentarUpdate(CommentarBase):
     uniq_id: str = None
-
-
