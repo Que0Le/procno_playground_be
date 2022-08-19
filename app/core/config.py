@@ -63,7 +63,7 @@ class Settings(BaseSettings):
     COOKIES_HTTP_ONLY: bool = True
     COOKIES_SAME_SITE: str = "Strict"
 
-    DATA_PATH: str = "../procno"
+    DATA_PATH: str = "../procno_data"
 
     class Config:
         case_sensitive = True

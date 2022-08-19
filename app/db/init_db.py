@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
-from app import crud, schemas
+from app.schemas import s_user
+from app.crud import crud_user
 from app.core.config import settings
 from app.db import base  # noqa: F401
 
@@ -15,12 +16,14 @@ def init_db(db: Session) -> None:
     # the tables un-commenting the next line
     # Base.metadata.create_all(bind=engine)
 
-    user = crud.user.get_by_email(db, email=settings.FIRST_SUPERUSER)
-    if not user:
-        print("no default user found. Create on ...")
-        user_in = schemas.UserCreate(
-            username=settings.FIRST_SUPERUSER_NAME,
-            email=settings.FIRST_SUPERUSER,
-            password=settings.FIRST_SUPERUSER_PASSWORD,
-        )
-        user = crud.user.create(db, obj_in=user_in)  # noqa: F841
+    # user = crud_user.crud_user.get_by_email(db, email=settings.FIRST_SUPERUSER)
+    # if not user:
+    #     print("no default user found. Create on ...")
+    #     user_in = s_user.UserCreate(
+    #         username=settings.FIRST_SUPERUSER_NAME,
+    #         email=settings.FIRST_SUPERUSER,
+    #         password=settings.FIRST_SUPERUSER_PASSWORD,
+    #     )
+    #     user = crud_user.crud_user.create(db, obj_in=user_in)  # noqa: F841
+    pass
+

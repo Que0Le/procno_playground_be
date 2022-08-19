@@ -1,12 +1,60 @@
 from datetime import datetime
-from typing import Optional
-from sqlalchemy.orm import Session
+from typing import Optional, List
 import uuid
+import logging
+
+from sqlalchemy.orm import Session
 from sqlalchemy import text
+from fastapi.encoders import jsonable_encoder
+
 from app.db.queries import *
 from app.crud.base import CRUDBase
+from app.models import m_small, m_user
+from app.schemas import *
+from app.models import *
 from app.schemas import s_small
-from app.models import m_small, m_topic, m_answer, m_question
+
+
+# logger = logging.getLogger(__name__)
+
+class CRUDRole(CRUDBase[m_small.RoleDB, s_small.RoleCreate, s_small.RoleUpdate]):
+    pass
+
+
+crud_role = CRUDRole(m_small.RoleDB)
+
+
+class CRUDUserRole(CRUDBase[m_small.UserRoleDB, s_small.UserRoleCreate, s_small.UserRoleUpdate]):
+    def get_roles_of_user(
+        self, db: Session, *, user_uniq_id: str, skip: int = 0, limit: int = 100
+    ) -> List[s_small.UserRoleGet]:
+        # logging.getLogger(__name__).info("test")
+        try:
+            result = (
+                db.query(
+                    m_user.UserDB.uniq_id, m_user.UserDB.username,
+                    m_small.RoleDB.uniq_id, m_small.RoleDB.role_name, 
+                    m_small.UserRoleDB.created_at
+                )
+                .filter(m_user.UserDB.uniq_id == user_uniq_id)
+                .filter(m_user.UserDB.uniq_id == m_small.UserRoleDB.user_uniq_id)
+                .filter(m_small.RoleDB.uniq_id == m_small.UserRoleDB.role_uniq_id)
+                .offset(skip)
+                .limit(limit)
+                .all()
+            )
+            if len(result) > 0:
+                return [s_small.UserRoleGet(*r) for r in result]
+        except Exception as e:
+            # logger.error(type(e))
+            # logger.error(e.args)
+            # logger.error(e)
+            pass
+
+        return []
+
+
+crud_user_role = CRUDUserRole(m_small.UserRoleDB)
 
 
 class CRUDTag(CRUDBase[m_small.TagDB, s_small.TagCreate, s_small.TagUpdate]):

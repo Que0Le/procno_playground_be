@@ -1,8 +1,10 @@
-from typing import Optional
+from datetime import datetime
+from typing import Optional, Any, Tuple
+from pydantic import BaseModel
+from uuid import UUID
 
-from pydantic import BaseModel, EmailStr
 
-
+""" Tags """
 class TagBase(BaseModel):
     tag_name: str = None
     description: str = None
@@ -35,20 +37,15 @@ class TagTopicUpdate(TagBase):
 
 
 
-
-
-
-
-
-
-
-
-
-
-# Role
+""" Role """
 class RoleBase(BaseModel):
     role_name: str
     description: str
+
+
+class RoleGet(RoleBase):
+    uniq_id: UUID
+    created_at: datetime
 
 
 # Properties to receive via API on creation
@@ -68,11 +65,42 @@ class RoleInDBBase(RoleBase):
         orm_mode = True
 
 
-# UserRole
+""" UserRole """
 # Shared properties
 class UserRoleBase(BaseModel):
-    user_id: int
-    role_id: int
+    user_id: UUID
+    role_id: UUID
+
+
+class UserRoleGet():
+    """_summary_
+    :param user_uniq_id: _description_
+    :type user_uniq_id: UUID
+    :param username: _description_
+    :type username: str
+    :param role_uniq_id: _description_
+    :type role_uniq_id: UUID
+    :param role_name: _description_
+    :type role_name: str
+    :param created_at: _description_
+    :type created_at: datetime
+    """
+
+    def __init__(
+        self, user_uniq_id: UUID, username: str,
+        role_uniq_id: UUID, role_name: str, created_at: datetime
+    ) -> None:
+        self.user_uniq_id = user_uniq_id
+        self.username = username
+        self.role_uniq_id = role_uniq_id
+        self.role_name = role_name
+        self.created_at = created_at
+
+    user_uniq_id: UUID
+    username: str
+    role_uniq_id: UUID
+    role_name: str
+    created_at: datetime
 
 
 # Properties to receive via API on creation
@@ -92,7 +120,7 @@ class UserRoleInDBBase(UserRoleBase):
         orm_mode = True
 
 
-# Record
+""" Record """
 class RecordBase(BaseModel):
     owner_uniq_id: str
     filename: str
@@ -108,7 +136,7 @@ class RecordUpdate(RecordBase):
     pass
 
 
-# ReadText
+""" ReadText """
 class ReadTextBase(BaseModel):
     owner_uniq_id: int = None
     read_text: str = None
@@ -124,7 +152,7 @@ class ReadTextUpdate(ReadTextBase):
     uniq_id: str = None
 
 
-# Commentar
+""" Commentar """
 class CommentarBase(BaseModel):
     owner_uniq_id: int
     read_text: str

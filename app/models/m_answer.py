@@ -1,15 +1,15 @@
 # from typing import TYPE_CHECKING
 
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
-# from sqlalchemy.orm import relationship
-
 from app.db.base_class import Base
-import uuid
 from sqlalchemy.dialects.postgresql import UUID
+
+import uuid
 
 
 # if TYPE_CHECKING:
 #     from .item import Item  # noqa: F401
+
 
 class AnswerDB(Base):
     # overwrite the table name

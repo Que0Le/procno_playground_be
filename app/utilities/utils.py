@@ -2,7 +2,9 @@ import logging
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Optional
+from xmlrpc.client import Boolean
 from jose import jwt
+import uuid
 
 from app.core.config import settings
 
@@ -23,3 +25,12 @@ def verify_password_reset_token(token: str) -> Optional[str]:
         return decoded_token["email"]
     except jwt.JWTError:
         return None
+
+
+def is_valid_uuid(val) -> Boolean:
+    try:
+        uuid.UUID(str(val))
+        return True
+    except ValueError:
+        return False
+
