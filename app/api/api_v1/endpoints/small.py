@@ -25,8 +25,20 @@ router_tags = APIRouter()
 def get_all_roles(
     db: Session = Depends(deps.get_db),
 ) -> Any:
-    roles = crud_small.crud_role.get_multi(db=db)
-    return roles
+    roles_db = crud_small.crud_role.get_multi(db=db)
+    return roles_db
+
+
+@router_roles.get("/{role_uniq_id}", response_model=s_small.RoleGet)
+def get_all_roles(
+    *,
+    db: Session = Depends(deps.get_db),
+    role_uniq_id: str,
+) -> Any:
+    role_db = crud_small.crud_role.get(db=db, uniq_id=role_uniq_id)
+    if not role_db:
+        raise HTTPException(status_code=404, detail=f"Role not found: {role_uniq_id}")
+    return role_db
 
 
 @router_roles.post("/", response_model=s_small.RoleGet)
@@ -36,12 +48,18 @@ def create_role(
     role_in: s_small.RoleCreate,
     # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
 ) -> Any:
+    role_db = crud_small.crud_role.get_role_by_role_name(db=db, role_name=role_in.role_name)
+    if role_db:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail=f"Role existed: {role_in.role_name}"
+        )
     role_db = crud_small.crud_role.create(db=db, obj_in=role_in)
     return role_db
 
 
 @router_roles.put("/{role_uniq_id}", response_model=s_small.RoleGet)
-def update_item(
+def update_role_by_uniq_id(
     *,
     db: Session = Depends(deps.get_db),
     role_uniq_id: str,
@@ -58,7 +76,7 @@ def update_item(
 
 
 @router_roles.delete("/{role_uniq_id}", response_model=s_small.RoleGet)
-def update_item(
+def delete_role_by_uniq_id(
     *,
     db: Session = Depends(deps.get_db),
     role_uniq_id: str,
@@ -75,7 +93,7 @@ def update_item(
 
 
 @router_roles.get("/for-user/{user_uniq_id}")
-def get_all_roles_for_user(
+def get_all_roles_for_user_uniq_id(
     *, db: Session = Depends(deps.get_db), user_uniq_id: str
 ) -> List[s_small.UserRoleGet]:
     if not utils.is_valid_uuid(user_uniq_id):
@@ -95,12 +113,74 @@ def get_all_roles_for_user(
 def get_all_tags(
     db: Session = Depends(deps.get_db),
 ) -> Any:
-    tags = crud_small.crud_tag.get_multi(db=db)
-    return tags
+    tags_db = crud_small.crud_tag.get_multi(db=db)
+    return tags_db
+
+
+@router_tags.get("/{tag_uniq_id}", response_model=s_small.TagGet)
+def get_all_tags(
+    *,
+    db: Session = Depends(deps.get_db),
+    tag_uniq_id: str,
+) -> Any:
+    tag_db = crud_small.crud_tag.get(db=db, uniq_id=tag_uniq_id)
+    if not tag_db:
+        raise HTTPException(status_code=404, detail=f"Tag not found: {tag_uniq_id}")
+    return tag_db
+
+
+@router_tags.post("/", response_model=s_small.TagGet)
+def create_tag(
+    *,
+    db: Session = Depends(deps.get_db),
+    tag_in: s_small.TagCreate,
+    # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
+) -> Any:
+    tag_db = crud_small.crud_tag.get_tag_by_tag_name(db=db, tag_name=tag_in.tag_name)
+    if tag_db:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail=f"Tag existed: {tag_in.tag_name}"
+        )
+    tag_db = crud_small.crud_tag.create(db=db, obj_in=tag_in)
+    return tag_db
+
+
+@router_tags.put("/{tag_uniq_id}", response_model=s_small.TagGet)
+def update_tag_by_uniq_id(
+    *,
+    db: Session = Depends(deps.get_db),
+    tag_uniq_id: str,
+    tag_in: s_small.TagUpdate,
+    # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
+) -> Any:
+    tag_db = crud_small.crud_tag.get(db=db, uniq_id=tag_uniq_id)
+    if not tag_db:
+        raise HTTPException(status_code=404, detail="Tag not found")
+    # if not crud.user.is_superuser(current_user) and (item.owner_id != current_user.id):
+    #     raise HTTPException(status_code=400, detail="Not enough permissions")
+    tag_db = crud_small.crud_tag.update(db=db, db_obj=tag_db, obj_in=tag_in)
+    return tag_db
+
+
+@router_tags.delete("/{tag_uniq_id}", response_model=s_small.TagGet)
+def delete_tag_by_uniq_id(
+    *,
+    db: Session = Depends(deps.get_db),
+    tag_uniq_id: str,
+    # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
+) -> Any:
+    tag_db = crud_small.crud_tag.get(db=db, uniq_id=tag_uniq_id)
+    if not tag_db:
+        raise HTTPException(status_code=404, detail="Tag not found")
+    # if not crud.user.is_superuser(current_user) and (item.owner_id != current_user.id):
+    #     raise HTTPException(status_code=400, detail="Not enough permissions")
+    tag_db = crud_small.crud_tag.remove(db=db, uniq_id=tag_uniq_id)
+    return tag_db
 
 
 @router_tags.get("/for-topic/{topic_uniq_id}")
-def get_all_tags_for_topic(
+def get_all_tags_for_topic_uniq_id(
     *, db: Session = Depends(deps.get_db), topic_uniq_id: str
 ) -> List[s_small.TagTopicGet]:
     if not utils.is_valid_uuid(topic_uniq_id):

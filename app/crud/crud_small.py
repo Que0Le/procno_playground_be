@@ -18,7 +18,14 @@ from app.schemas import s_small
 # logger = logging.getLogger(__name__)
 
 class CRUDRole(CRUDBase[m_small.RoleDB, s_small.RoleCreate, s_small.RoleUpdate]):
-    pass
+    def get_role_by_role_name(
+        self, db: Session, *, role_name: str
+    ) -> m_small.RoleDB:
+        return (
+            db.query(self.model)
+            .filter(m_small.RoleDB.role_name == role_name)
+            .first()
+        )
 
 
 crud_role = CRUDRole(m_small.RoleDB)
@@ -60,17 +67,14 @@ crud_user_role = CRUDUserRole(m_small.UserRoleDB)
 
 
 class CRUDTag(CRUDBase[m_small.TagDB, s_small.TagCreate, s_small.TagUpdate]):
-    # @staticmethod
-    # def create_tag(db: Session, *, tag_name: str, description: str) -> m_small.TagDB:
-    #     result = db.execute(
-    #         text(queries_tag.INSERT_SINGLE),
-    #         {"tag_name": tag_name, "description": description}
-    #     )
-    #     db.commit()
-    #     results_as_dict = result.mappings().all()
-    #     tag_db = m_small.TagDB(**results_as_dict[0])
-    #     return tag_db
-    pass
+    def get_tag_by_tag_name(
+        self, db: Session, *, tag_name: str
+    ) -> m_small.TagDB:
+        return (
+            db.query(self.model)
+            .filter(m_small.TagDB.tag_name == tag_name)
+            .first()
+        )
 
 
 crud_tag = CRUDTag(m_small.TagDB)
