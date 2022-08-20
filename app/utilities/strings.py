@@ -17,6 +17,11 @@ def slugify(value, allow_unicode=False):
     value = re.sub(r'[^\w\s-]', '', value.lower())
     return re.sub(r'[-\s]+', '-', value).strip('-_')
 
+def clean_string(value, allow_unicode=False):
+    """ Clean string for write in DB """
+    # TODO: implement
+    return value
+
 def clean_filename(value, allow_unicode=False):
     # TODO: clean the value to produce a valid filename (with extension)
     return value

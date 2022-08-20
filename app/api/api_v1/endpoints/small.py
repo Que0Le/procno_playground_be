@@ -20,6 +20,7 @@ from app.utilities import utils
 router_roles = APIRouter()
 router_tags = APIRouter()
 
+# TODO: clean input
 
 @router_roles.get("/", response_model=List[s_small.RoleGet])
 def get_all_roles(
@@ -66,11 +67,20 @@ def update_role_by_uniq_id(
     role_in: s_small.RoleUpdate,
     # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
 ) -> Any:
+    # Check permission
+    # if not crud.user.is_superuser(current_user) and (item.owner_id != current_user.id):
+    #     raise HTTPException(status_code=400, detail="Not enough permissions")
     role_db = crud_small.crud_role.get(db=db, uniq_id=role_uniq_id)
     if not role_db:
         raise HTTPException(status_code=404, detail="Role not found")
-    # if not crud.user.is_superuser(current_user) and (item.owner_id != current_user.id):
-    #     raise HTTPException(status_code=400, detail="Not enough permissions")
+    # Check if there existed a role with same name
+    role_db_with_same_new_name = crud_small.crud_role.get_role_by_role_name(db=db, role_name=role_in.role_name)
+    if role_db_with_same_new_name:
+        if role_db_with_same_new_name.role_name != role_in.role_name:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, 
+                detail=f"Couldn't change role name: Role name existed: {role_in.role_name}"
+            )
     role_db = crud_small.crud_role.update(db=db, db_obj=role_db, obj_in=role_in)
     return role_db
 
@@ -83,11 +93,11 @@ def delete_role_by_uniq_id(
     role_in: s_small.RoleUpdate,
     # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
 ) -> Any:
+    # if not crud.user.is_superuser(current_user) and (item.owner_id != current_user.id):
+    #     raise HTTPException(status_code=400, detail="Not enough permissions")
     role_db = crud_small.crud_role.get(db=db, uniq_id=role_uniq_id)
     if not role_db:
         raise HTTPException(status_code=404, detail="Role not found")
-    # if not crud.user.is_superuser(current_user) and (item.owner_id != current_user.id):
-    #     raise HTTPException(status_code=400, detail="Not enough permissions")
     role_db = crud_small.crud_role.remove(db=db, uniq_id=role_uniq_id)
     return role_db
 
@@ -154,11 +164,18 @@ def update_tag_by_uniq_id(
     tag_in: s_small.TagUpdate,
     # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
 ) -> Any:
+    # if not crud.user.is_superuser(current_user) and (item.owner_id != current_user.id):
+    #     raise HTTPException(status_code=400, detail="Not enough permissions")
     tag_db = crud_small.crud_tag.get(db=db, uniq_id=tag_uniq_id)
     if not tag_db:
         raise HTTPException(status_code=404, detail="Tag not found")
-    # if not crud.user.is_superuser(current_user) and (item.owner_id != current_user.id):
-    #     raise HTTPException(status_code=400, detail="Not enough permissions")
+    tag_db_with_same_new_name = crud_small.crud_tag.get_tag_by_tag_name(db=db, tag_name=tag_in.tag_name)
+    if tag_db_with_same_new_name:
+        if tag_db_with_same_new_name.tag_name != tag_in.tag_name:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, 
+                detail=f"Couldn't change tag name: Tag existed: {tag_in.tag_name}"
+            )
     tag_db = crud_small.crud_tag.update(db=db, db_obj=tag_db, obj_in=tag_in)
     return tag_db
 
@@ -170,11 +187,11 @@ def delete_tag_by_uniq_id(
     tag_uniq_id: str,
     # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
 ) -> Any:
+    # if not crud.user.is_superuser(current_user) and (item.owner_id != current_user.id):
+    #     raise HTTPException(status_code=400, detail="Not enough permissions")
     tag_db = crud_small.crud_tag.get(db=db, uniq_id=tag_uniq_id)
     if not tag_db:
         raise HTTPException(status_code=404, detail="Tag not found")
-    # if not crud.user.is_superuser(current_user) and (item.owner_id != current_user.id):
-    #     raise HTTPException(status_code=400, detail="Not enough permissions")
     tag_db = crud_small.crud_tag.remove(db=db, uniq_id=tag_uniq_id)
     return tag_db
 
