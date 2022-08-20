@@ -4,16 +4,16 @@ import uuid
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from app.db.base_class import Base
 from sqlalchemy.dialects.postgresql import UUID
-
+from sqlalchemy.schema import FetchedValue
 
 class RoleDB(Base):
     __tablename__ = 'roles'
-    uniq_id: uuid.UUID = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    id = Column(Integer, autoincrement=True)
+    uniq_id: uuid.UUID = Column(UUID(as_uuid=True), primary_key=True, server_default=FetchedValue())#, default=uuid.uuid4)
+    id = Column(Integer, autoincrement=True, server_default=FetchedValue())
     role_name = Column(String, index=True)
     description = Column(String, unique=False, index=False, nullable=False)
-    created_at = Column(DateTime(), nullable=False)
-    updated_at = Column(DateTime(), nullable=False)
+    created_at = Column(DateTime(), nullable=False, server_default=FetchedValue())
+    updated_at = Column(DateTime(), nullable=False, server_default=FetchedValue())
 
 
 class UserRoleDB(Base):
