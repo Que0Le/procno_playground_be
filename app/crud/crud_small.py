@@ -109,18 +109,16 @@ crud_record = CRUDRecord(m_small.RecordDB)
 
 
 class CRUDReadText(CRUDBase[m_small.ReadTextDB, s_small.ReadTextCreate, s_small.ReadTextUpdate]):
-    @staticmethod
-    def create_read_text(
-            db: Session, *, read_text_from_user: str, owner_uniq_id: UUID
-    ) -> Optional[m_small.ReadTextDB]:
-        result = db.execute(
-            text(queries_read_text.INSERT_SINGLE),
-            {"read_text": read_text_from_user, "owner_uniq_id": owner_uniq_id}
+    def get_rad_texts_of_user_by_uniq_id(
+        self, db: Session, *, user_uniq_id: UUID, skip: int = 0, limit: int = 100
+    ) -> m_small.ReadTextDB:
+        return (
+            db.query(m_small.ReadTextDB)
+            .filter(m_small.ReadTextDB.owner_uniq_id == user_uniq_id)
+            .offset(skip)
+            .limit(limit)
+            .all()
         )
-        db.commit()
-        results_as_dict = result.mappings().all()
-        read_text_db = m_small.ReadTextDB(**results_as_dict[0])
-        return read_text_db
 
 
 crud_read_text = CRUDReadText(m_small.ReadTextDB)

@@ -24,6 +24,7 @@ router_roles = APIRouter()
 router_tags = APIRouter()
 router_records = APIRouter()
 router_commentars = APIRouter()
+router_read_texts = APIRouter()
 
 # TODO: clean input
 
@@ -99,7 +100,6 @@ def delete_role_by_uniq_id(
     *,
     db: Session = Depends(deps.get_db),
     role_uniq_id: UUID,
-    role_in: s_small.RoleUpdate,
     # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
 ) -> Any:
     # if not crud.user.is_superuser(current_user) and (item.owner_id != current_user.id):
@@ -432,7 +432,6 @@ def delete_commentar_by_uniq_id(
     *,
     db: Session = Depends(deps.get_db),
     commentar_uniq_id: UUID,
-    commentar_in: s_small.CommentarUpdate,
     # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
 ) -> Any:
     # if not crud.user.is_superuser(current_user) and (item.owner_id != current_user.id):
@@ -457,3 +456,83 @@ def get_all_commentars_for_user_uniq_id(
         db=db, user_uniq_id=user_uniq_id)
     return user_commentars
 
+
+""" READ_TEXTS """
+
+@router_read_texts.get("/", response_model=List[s_small.ReadTextGet])
+def get_all_read_texts(
+    db: Session = Depends(deps.get_db),
+) -> Any:
+    read_texts_db = crud_small.crud_read_text.get_multi(db=db)
+    return read_texts_db
+
+
+@router_read_texts.get("/{read_text_uniq_id}", response_model=s_small.ReadTextGet)
+def get_all_read_texts(
+    *,
+    db: Session = Depends(deps.get_db),
+    read_text_uniq_id: UUID,
+) -> Any:
+    read_text_db = crud_small.crud_read_text.get(db=db, uniq_id=read_text_uniq_id)
+    if not read_text_db:
+        raise HTTPException(status_code=404, detail=f"Read_text not found: {read_text_uniq_id}")
+    return read_text_db
+
+
+@router_read_texts.post("/", response_model=s_small.ReadTextGet)
+def create_read_text(
+    *,
+    db: Session = Depends(deps.get_db),
+    read_text_in: s_small.ReadTextCreate,
+    # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
+) -> Any:
+    read_text_db = crud_small.crud_read_text.create(db=db, obj_in=read_text_in)
+    return read_text_db
+
+
+@router_read_texts.put("/{read_text_uniq_id}", response_model=s_small.ReadTextGet)
+def update_read_text_by_uniq_id(
+    *,
+    db: Session = Depends(deps.get_db),
+    read_text_uniq_id: UUID,
+    read_text_in: s_small.ReadTextUpdate,
+    # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
+) -> Any:
+    # Check permission
+    # if not crud.user.is_superuser(current_user) and (item.owner_id != current_user.id):
+    #     raise HTTPException(status_code=400, detail="Not enough permissions")
+    read_text_db = crud_small.crud_read_text.get(db=db, uniq_id=read_text_uniq_id)
+    if not read_text_db:
+        raise HTTPException(status_code=404, detail="Read_text not found")
+    read_text_db = crud_small.crud_read_text.update(db=db, db_obj=read_text_db, obj_in=read_text_in)
+    return read_text_db
+
+
+@router_read_texts.delete("/{read_text_uniq_id}", response_model=s_small.ReadTextGet)
+def delete_read_text_by_uniq_id(
+    *,
+    db: Session = Depends(deps.get_db),
+    read_text_uniq_id: UUID,
+    # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
+) -> Any:
+    # if not crud.user.is_superuser(current_user) and (item.owner_id != current_user.id):
+    #     raise HTTPException(status_code=400, detail="Not enough permissions")
+    read_text_db = crud_small.crud_read_text.get(db=db, uniq_id=read_text_uniq_id)
+    if not read_text_db:
+        raise HTTPException(status_code=404, detail="Read_text not found")
+    read_text_db = crud_small.crud_read_text.remove(db=db, uniq_id=read_text_uniq_id)
+    return read_text_db
+
+
+@router_read_texts.get("/for-user/{user_uniq_id}")
+def get_all_read_texts_for_user_uniq_id(
+    *, db: Session = Depends(deps.get_db), user_uniq_id: UUID
+) -> List[s_small.ReadTextGet]:
+    if not utils.is_valid_uuid(user_uniq_id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Couldn't process UUID : {user_uniq_id}",
+        )
+    user_read_texts = crud_small.crud_read_text.get_read_texts_of_user_by_uniq_id(
+        db=db, user_uniq_id=user_uniq_id)
+    return user_read_texts

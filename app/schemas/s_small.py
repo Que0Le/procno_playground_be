@@ -245,7 +245,7 @@ class CommentarInDBBase(CommentarBase):
     commentar: str
     created_at: datetime
     updated_at: datetime
-    
+
     class Config:
         orm_mode = True
 
@@ -258,8 +258,8 @@ class CommentarGet(CommentarInDBBase):
 
 
 class ReadTextBase(BaseModel):
-    owner_uniq_id: UUID
-    read_text: str
+    owner_uniq_id: Optional[UUID]
+    read_text: Optional[str]
 
 
 # Properties to receive via API on creation
@@ -270,16 +270,19 @@ class ReadTextCreate(ReadTextBase):
 # Properties to receive via API on update
 class ReadTextUpdate(ReadTextBase):
     uniq_id: UUID
+    owner_uniq_id: UUID
+    read_text: str
 
 
 class ReadTextInDBBase(ReadTextBase):
-    pass
-
+    uniq_id: UUID
+    owner_uniq_id: UUID
+    read_text: str
+    created_at: datetime
+    updated_at: datetime
     class Config:
         orm_mode = True
 
 
 class ReadTextGet(ReadTextInDBBase):
-    uniq_id: UUID
-    created_at: datetime
-    updated_at: datetime
+    pass
