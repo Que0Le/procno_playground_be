@@ -1,28 +1,26 @@
 # from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, Column, Integer, String, DateTime, ForeignKey, ARRAY
-# from sqlalchemy.orm import relationship
 import uuid
 
 from app.db.base_class import Base
 from sqlalchemy.dialects.postgresql import UUID
-
-# if TYPE_CHECKING:
-#     from .item import Item  # noqa: F401
+from sqlalchemy.schema import FetchedValue
 
 
 class QuestionDB(Base):
     # overwrite the table name
     __tablename__ = 'questions'
 
-    id = Column(Integer, index=True)
-    uniq_id: uuid.UUID = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(Integer, index=True, server_default=FetchedValue())
+    uniq_id: uuid.UUID = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, server_default=FetchedValue())
+    topic_uniq_id = Column(UUID(as_uuid=True), ForeignKey("topics.uniq_id"))
     owner_uniq_id = Column(UUID(as_uuid=True), ForeignKey("users.uniq_id"))
     commentar_uniq_id = Column(UUID(as_uuid=True), ForeignKey("commentars.uniq_id"))
     record_uniq_id = Column(UUID(as_uuid=True), ForeignKey("records.uniq_id"))
-    text_uniq_id = Column(UUID(as_uuid=True), ForeignKey("read_texts.uniq_id"))
-    created_at = Column(DateTime(), nullable=False)
-    updated_at = Column(DateTime(), nullable=False)
+    read_text_uniq_id = Column(UUID(as_uuid=True), ForeignKey("read_texts.uniq_id"))
+    created_at = Column(DateTime(), nullable=False, server_default=FetchedValue())
+    updated_at = Column(DateTime(), nullable=False, server_default=FetchedValue())
 
 
 class QuestionCombiDB(Base):

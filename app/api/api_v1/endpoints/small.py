@@ -1,9 +1,5 @@
-from genericpath import isfile
 import os
 from typing import Any, List, Optional
-from datetime import datetime
-import random
-import string
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, status, Form, UploadFile, File, HTTPException
@@ -41,7 +37,7 @@ def get_all_roles(
 
 
 @router_roles.get("/{role_uniq_id}", response_model=s_small.RoleGet)
-def get_all_roles(
+def get_role_by_uniq_id(
     *,
     db: Session = Depends(deps.get_db),
     role_uniq_id: UUID,
@@ -132,7 +128,7 @@ def get_all_tags(
 
 
 @router_tags.get("/{tag_uniq_id}", response_model=s_small.TagGet)
-def get_all_tags(
+def get_tag_by_uniq_id(
     *,
     db: Session = Depends(deps.get_db),
     tag_uniq_id: UUID,
@@ -378,6 +374,7 @@ def get_all_meta_records_for_user_uniq_id(
 
 """ COMMENTARS """
 
+
 @router_commentars.get("/", response_model=List[s_small.CommentarGet])
 def get_all_commentars(
     db: Session = Depends(deps.get_db),
@@ -387,7 +384,7 @@ def get_all_commentars(
 
 
 @router_commentars.get("/{commentar_uniq_id}", response_model=s_small.CommentarGet)
-def get_all_commentars(
+def get_commentar_by_uniq_id(
     *,
     db: Session = Depends(deps.get_db),
     commentar_uniq_id: UUID,
@@ -459,6 +456,7 @@ def get_all_commentars_for_user_uniq_id(
 
 """ READ_TEXTS """
 
+
 @router_read_texts.get("/", response_model=List[s_small.ReadTextGet])
 def get_all_read_texts(
     db: Session = Depends(deps.get_db),
@@ -468,7 +466,7 @@ def get_all_read_texts(
 
 
 @router_read_texts.get("/{read_text_uniq_id}", response_model=s_small.ReadTextGet)
-def get_all_read_texts(
+def get_read_text_by_uniq_id(
     *,
     db: Session = Depends(deps.get_db),
     read_text_uniq_id: UUID,

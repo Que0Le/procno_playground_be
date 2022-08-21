@@ -192,7 +192,7 @@ CREATE TABLE public.questions (
 	topic_uniq_id uuid not null,
 	commentar_uniq_id uuid not null,
 	record_uniq_id uuid not null,
-	text_uniq_id uuid not null,
+	read_text_uniq_id uuid not null,
 	created_at timestamptz NOT NULL DEFAULT now(),
 	updated_at timestamptz NOT NULL DEFAULT now(),
 	uniq_id uuid DEFAULT uuid_generate_v4 (),
@@ -201,7 +201,7 @@ CREATE TABLE public.questions (
 	FOREIGN KEY (owner_uniq_id) REFERENCES public.users(uniq_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	FOREIGN KEY (commentar_uniq_id) REFERENCES public.commentars(uniq_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	FOREIGN KEY (record_uniq_id) REFERENCES public.records(uniq_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	FOREIGN KEY (text_uniq_id) REFERENCES public.read_texts(uniq_id) ON DELETE RESTRICT ON UPDATE CASCADE
+	FOREIGN KEY (read_text_uniq_id) REFERENCES public.read_texts(uniq_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 CREATE UNIQUE INDEX ix_questions_uniq_id ON public.questions USING btree (uniq_id);
 -- Table Triggers
