@@ -223,31 +223,35 @@ class RecordGet(RecordInDBBase):
 
 
 class CommentarBase(BaseModel):
-    owner_uniq_id: UUID
-    commentar: str
+    owner_uniq_id: Optional[UUID]
+    commentar: Optional[str]
 
 
 # Properties to receive via API on creation
 class CommentarCreate(CommentarBase):
-    pass
+    owner_uniq_id: UUID
+    commentar: str
 
 
 # Properties to receive via API on update
 class CommentarUpdate(CommentarBase):
-    uniq_id: UUID
+    owner_uniq_id: UUID
+    commentar: str
 
 
 class CommentarInDBBase(CommentarBase):
-    pass
-
+    uniq_id: UUID
+    owner_uniq_id: UUID
+    commentar: str
+    created_at: datetime
+    updated_at: datetime
+    
     class Config:
         orm_mode = True
 
 
 class CommentarGet(CommentarInDBBase):
-    uniq_id: UUID
-    created_at: datetime
-    updated_at: datetime
+    pass
 
 
 """ ReadText """

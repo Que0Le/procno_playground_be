@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Optional, List
 import uuid
 import logging
+from uuid import UUID
 
 from sqlalchemy.orm import Session
 from sqlalchemy import text
@@ -33,34 +34,17 @@ crud_role = CRUDRole(m_small.RoleDB)
 
 class CRUDUserRole(CRUDBase[m_small.UserRoleDB, s_small.UserRoleCreate, s_small.UserRoleUpdate]):
     def get_roles_of_user(
-        self, db: Session, *, user_uniq_id: str, skip: int = 0, limit: int = 100
-    ) -> List[s_small.UserRoleGet]:
-        # logging.getLogger(__name__).info("test")
-        try:
-            result = (
-                db.query(
-                    m_user.UserDB.uniq_id, m_user.UserDB.username,
-                    m_small.RoleDB.uniq_id, m_small.RoleDB.role_name, 
-                    m_small.RoleDB.description, m_small.UserRoleDB.created_at
-                )
-                .filter(m_user.UserDB.uniq_id == user_uniq_id)
-                .filter(m_user.UserDB.uniq_id == m_small.UserRoleDB.user_uniq_id)
-                .filter(m_small.RoleDB.uniq_id == m_small.UserRoleDB.role_uniq_id)
-                .offset(skip)
-                .limit(limit)
-                .all()
-            )
-            if len(result) > 0:
-                return [s_small.UserRoleGet(*r) for r in result]
-        except Exception as e:
-            # logger.error(type(e))
-            # logger.error(e.args)
-            # logger.error(e)
-            #TODO: logging
-            print(e)
-            pass
-
-        return []
+        self, db: Session, *, user_uniq_id: UUID, skip: int = 0, limit: int = 100
+    ) -> List[m_small.RoleDB]:
+        return (
+            db.query(m_small.RoleDB)
+            .filter(m_user.UserDB.uniq_id == user_uniq_id)
+            .filter(m_user.UserDB.uniq_id == m_small.UserRoleDB.user_uniq_id)
+            .filter(m_small.RoleDB.uniq_id == m_small.UserRoleDB.role_uniq_id)
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
 
 
 crud_user_role = CRUDUserRole(m_small.UserRoleDB)
@@ -83,32 +67,17 @@ crud_tag = CRUDTag(m_small.TagDB)
 class CRUDTagTopic(CRUDBase[m_small.TagTopicDB, s_small.TagTopicCreate, s_small.TagTopicUpdate]):
 
     def get_tags_of_topic(
-        self, db: Session, *, topic_uniq_id: str, skip: int = 0, limit: int = 100
-    ) -> List[s_small.TagTopicGet]:
-        # logging.getLogger(__name__).info("test")
-        try:
-            result = (
-                db.query(
-                    m_topic.TopicDB.uniq_id, m_topic.TopicDB.title,
-                    m_small.TagDB.uniq_id, m_small.TagDB.tag_name, 
-                    m_small.TagDB.description, m_small.TagTopicDB.created_at
-                )
-                .filter(m_topic.TopicDB.uniq_id == topic_uniq_id)
-                .filter(m_topic.TopicDB.uniq_id == m_small.TagTopicDB.topic_uniq_id)
-                .filter(m_small.TagDB.uniq_id == m_small.TagTopicDB.tag_uniq_id)
-                .offset(skip)
-                .limit(limit)
-                .all()
-            )
-            if len(result) > 0:
-                return [s_small.TagTopicGet(*r) for r in result]
-        except Exception as e:
-            # logger.error(type(e))
-            # logger.error(e.args)
-            # logger.error(e)
-            pass
-
-        return []
+        self, db: Session, *, topic_uniq_id: UUID, skip: int = 0, limit: int = 100
+    ) -> List[m_small.TagDB]:
+        return (
+            db.query(m_small.TagDB)
+            .filter(m_topic.TopicDB.uniq_id == topic_uniq_id)
+            .filter(m_topic.TopicDB.uniq_id == m_small.TagTopicDB.topic_uniq_id)
+            .filter(m_small.TagDB.uniq_id == m_small.TagTopicDB.tag_uniq_id)
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
 
 
 crud_tag_topic = CRUDTagTopic(m_small.TagTopicDB)
@@ -124,9 +93,8 @@ class CRUDRecord(CRUDBase[m_small.RecordDB, s_small.RecordCreate, s_small.Record
             .first()
         )
 
-
     def get_records_of_user_by_uniq_id(
-        self, db: Session, *, user_uniq_id: str, skip: int = 0, limit: int = 100
+        self, db: Session, *, user_uniq_id: UUID, skip: int = 0, limit: int = 100
     ) -> m_small.RecordDB:
         return (
             db.query(m_small.RecordDB)
@@ -143,7 +111,7 @@ crud_record = CRUDRecord(m_small.RecordDB)
 class CRUDReadText(CRUDBase[m_small.ReadTextDB, s_small.ReadTextCreate, s_small.ReadTextUpdate]):
     @staticmethod
     def create_read_text(
-            db: Session, *, read_text_from_user: str, owner_uniq_id: str
+            db: Session, *, read_text_from_user: str, owner_uniq_id: UUID
     ) -> Optional[m_small.ReadTextDB]:
         result = db.execute(
             text(queries_read_text.INSERT_SINGLE),
@@ -159,18 +127,16 @@ crud_read_text = CRUDReadText(m_small.ReadTextDB)
 
 
 class CRUDCommentar(CRUDBase[m_small.CommentarDB, s_small.CommentarCreate, s_small.CommentarUpdate]):
-    @staticmethod
-    def create_commentar(
-            db: Session, *, commentar_from_user: str, owner_uniq_id: str
-    ) -> Optional[m_small.CommentarDB]:
-        result = db.execute(
-            text(queries_commentar.INSERT_SINGLE),
-            {"commentar": commentar_from_user, "owner_uniq_id": owner_uniq_id}
+    def get_commentars_of_user_by_uniq_id(
+        self, db: Session, *, user_uniq_id: UUID, skip: int = 0, limit: int = 100
+    ) -> m_small.RecordDB:
+        return (
+            db.query(m_small.CommentarDB)
+            .filter(m_small.CommentarDB.owner_uniq_id == user_uniq_id)
+            .offset(skip)
+            .limit(limit)
+            .all()
         )
-        db.commit()
-        results_as_dict = result.mappings().all()
-        commentar_db = m_small.CommentarDB(**results_as_dict[0])
-        return commentar_db
 
 
 crud_commentar = CRUDCommentar(m_small.CommentarDB)

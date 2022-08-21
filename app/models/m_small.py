@@ -10,7 +10,7 @@ class RoleDB(Base):
     __tablename__ = 'roles'
     uniq_id: uuid.UUID = Column(UUID(as_uuid=True), primary_key=True, server_default=FetchedValue())#, default=uuid.uuid4)
     id = Column(Integer, autoincrement=True, server_default=FetchedValue())
-    role_name = Column(String, index=True)
+    role_name = Column(String, nullable=False, index=True)
     description = Column(String, unique=False, index=False, nullable=False)
     created_at = Column(DateTime(), nullable=False, server_default=FetchedValue())
     updated_at = Column(DateTime(), nullable=False, server_default=FetchedValue())
@@ -30,7 +30,7 @@ class TagDB(Base):
     __tablename__ = 'tags'
     uniq_id: uuid.UUID = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, server_default=FetchedValue())
     id = Column(Integer, autoincrement=True, server_default=FetchedValue())
-    tag_name = Column(String, index=True)
+    tag_name = Column(String, nullable=False, index=True)
     description = Column(String, unique=False, index=False, nullable=False)
     created_at = Column(DateTime(), nullable=False, server_default=FetchedValue())
     updated_at = Column(DateTime(), nullable=False, server_default=FetchedValue())
@@ -61,7 +61,7 @@ class ReadTextDB(Base):
     __tablename__ = 'read_texts'
     uniq_id: uuid.UUID = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, server_default=FetchedValue())
     id = Column(Integer, autoincrement=True, server_default=FetchedValue())
-    read_text = Column(String)
+    read_text = Column(String, nullable=False)
     owner_uniq_id = Column(UUID(as_uuid=True), ForeignKey("users.uniq_id"))
     created_at = Column(DateTime(), nullable=False, server_default=FetchedValue())
     updated_at = Column(DateTime(), nullable=False, server_default=FetchedValue())
@@ -71,7 +71,7 @@ class CommentarDB(Base):
     __tablename__ = 'commentars'
     uniq_id: uuid.UUID = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, server_default=FetchedValue())
     id = Column(Integer, autoincrement=True, server_default=FetchedValue())
-    commentar = Column(String)
+    commentar = Column(String, nullable=False)
     owner_uniq_id = Column(UUID(as_uuid=True), ForeignKey("users.uniq_id"))
     created_at = Column(DateTime(), nullable=False, server_default=FetchedValue())
     updated_at = Column(DateTime(), nullable=False, server_default=FetchedValue())

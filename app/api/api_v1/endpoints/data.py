@@ -31,7 +31,7 @@ def iter_file(path: str):
 
 @router.get("/records/{record_filename}")
 async def get_record_by_file(record_filename: str) -> FileResponse:
-    clean_filename = slugify(record_filename)
+    clean_filename = slugify(record_filename, to_lower=False)
     if not os.path.isfile(f"{settings.DATA_PATH}/records/" + clean_filename):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

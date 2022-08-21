@@ -3,7 +3,7 @@ import re
 import string, random
 
 
-def slugify(value, allow_unicode=False):
+def slugify(value, allow_unicode=False, to_lower=True):
     """
     Taken from https://github.com/django/django/blob/master/django/utils/text.py
     Convert to ASCII if 'allow_unicode' is False. Convert spaces or repeated

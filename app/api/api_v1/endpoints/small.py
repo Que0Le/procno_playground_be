@@ -23,6 +23,7 @@ from app.utilities import utils, strings, files_and_dir
 router_roles = APIRouter()
 router_tags = APIRouter()
 router_records = APIRouter()
+router_commentars = APIRouter()
 
 # TODO: clean input
 
@@ -110,15 +111,10 @@ def delete_role_by_uniq_id(
     return role_db
 
 
-@router_roles.get("/for-user/{user_uniq_id}")
+@router_roles.get("/for-user/{user_uniq_id}", response_model=List[s_small.RoleGet])
 def get_all_roles_for_user_uniq_id(
     *, db: Session = Depends(deps.get_db), user_uniq_id: UUID
-) -> List[s_small.UserRoleGet]:
-    if not utils.is_valid_uuid(user_uniq_id):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Couldn't process UUID : {user_uniq_id}",
-        )
+) -> Any:
     user_roles = crud_small.crud_user_role.get_roles_of_user(
         db=db, user_uniq_id=user_uniq_id)
     return user_roles
@@ -204,18 +200,18 @@ def delete_tag_by_uniq_id(
     return tag_db
 
 
-@router_tags.get("/for-topic/{topic_uniq_id}")
+@router_tags.get("/for-topic/{topic_uniq_id}", response_model=List[s_small.TagGet])
 def get_all_tags_for_topic_uniq_id(
     *, db: Session = Depends(deps.get_db), topic_uniq_id: UUID
-) -> List[s_small.TagTopicGet]:
+) -> Any:
     if not utils.is_valid_uuid(topic_uniq_id):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Couldn't process UUID : {topic_uniq_id}",
         )
-    tags_topic = crud_small.crud_tag_topic.get_tags_of_topic(
+    tags_db = crud_small.crud_tag_topic.get_tags_of_topic(
         db=db, topic_uniq_id=topic_uniq_id)
-    return tags_topic
+    return tags_db
 
 
 """ RECORDS """
@@ -378,3 +374,86 @@ def get_all_meta_records_for_user_uniq_id(
         db=db, user_uniq_id=user_uniq_id
     )
     return user_records_db
+
+
+""" COMMENTARS """
+
+@router_commentars.get("/", response_model=List[s_small.CommentarGet])
+def get_all_commentars(
+    db: Session = Depends(deps.get_db),
+) -> Any:
+    commentars_db = crud_small.crud_commentar.get_multi(db=db)
+    return commentars_db
+
+
+@router_commentars.get("/{commentar_uniq_id}", response_model=s_small.CommentarGet)
+def get_all_commentars(
+    *,
+    db: Session = Depends(deps.get_db),
+    commentar_uniq_id: UUID,
+) -> Any:
+    commentar_db = crud_small.crud_commentar.get(db=db, uniq_id=commentar_uniq_id)
+    if not commentar_db:
+        raise HTTPException(status_code=404, detail=f"Commentar not found: {commentar_uniq_id}")
+    return commentar_db
+
+
+@router_commentars.post("/", response_model=s_small.CommentarGet)
+def create_commentar(
+    *,
+    db: Session = Depends(deps.get_db),
+    commentar_in: s_small.CommentarCreate,
+    # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
+) -> Any:
+    commentar_db = crud_small.crud_commentar.create(db=db, obj_in=commentar_in)
+    return commentar_db
+
+
+@router_commentars.put("/{commentar_uniq_id}", response_model=s_small.CommentarGet)
+def update_commentar_by_uniq_id(
+    *,
+    db: Session = Depends(deps.get_db),
+    commentar_uniq_id: UUID,
+    commentar_in: s_small.CommentarUpdate,
+    # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
+) -> Any:
+    # Check permission
+    # if not crud.user.is_superuser(current_user) and (item.owner_id != current_user.id):
+    #     raise HTTPException(status_code=400, detail="Not enough permissions")
+    commentar_db = crud_small.crud_commentar.get(db=db, uniq_id=commentar_uniq_id)
+    if not commentar_db:
+        raise HTTPException(status_code=404, detail="Commentar not found")
+    commentar_db = crud_small.crud_commentar.update(db=db, db_obj=commentar_db, obj_in=commentar_in)
+    return commentar_db
+
+
+@router_commentars.delete("/{commentar_uniq_id}", response_model=s_small.CommentarGet)
+def delete_commentar_by_uniq_id(
+    *,
+    db: Session = Depends(deps.get_db),
+    commentar_uniq_id: UUID,
+    commentar_in: s_small.CommentarUpdate,
+    # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
+) -> Any:
+    # if not crud.user.is_superuser(current_user) and (item.owner_id != current_user.id):
+    #     raise HTTPException(status_code=400, detail="Not enough permissions")
+    commentar_db = crud_small.crud_commentar.get(db=db, uniq_id=commentar_uniq_id)
+    if not commentar_db:
+        raise HTTPException(status_code=404, detail="Commentar not found")
+    commentar_db = crud_small.crud_commentar.remove(db=db, uniq_id=commentar_uniq_id)
+    return commentar_db
+
+
+@router_commentars.get("/for-user/{user_uniq_id}")
+def get_all_commentars_for_user_uniq_id(
+    *, db: Session = Depends(deps.get_db), user_uniq_id: UUID
+) -> List[s_small.CommentarGet]:
+    if not utils.is_valid_uuid(user_uniq_id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Couldn't process UUID : {user_uniq_id}",
+        )
+    user_commentars = crud_small.crud_commentar.get_commentars_of_user_by_uniq_id(
+        db=db, user_uniq_id=user_uniq_id)
+    return user_commentars
+
