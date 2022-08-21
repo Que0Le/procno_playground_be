@@ -1,0 +1,311 @@
+{
+	"info": {
+		"_postman_id": "9c243292-47fc-4b7c-aa9d-0bb228b9f66e",
+		"name": "Procno v1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get all roles /roles/",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{server_base}}/roles/",
+					"host": [
+						"{{server_base}}"
+					],
+					"path": [
+						"roles",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get role by uniq id /roles/{uniq_id}",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{server_base}}/roles/886169ef-ead6-49f5-9562-432311fa003f",
+					"host": [
+						"{{server_base}}"
+					],
+					"path": [
+						"roles",
+						"886169ef-ead6-49f5-9562-432311fa003f"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post a role /roles/",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"role_name\": \"role create 1234\",\r\n    \"description\": \"desc 3\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_base}}/roles/",
+					"host": [
+						"{{server_base}}"
+					],
+					"path": [
+						"roles",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete role by uniq id /roles/{uniq_id}",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"role_name\": \"role create 321123\",\r\n    \"description\": \"desc 321\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://192.168.1.32:8888/api/v1/roles/75e01965-95eb-41d5-baaa-19c72f5390a2",
+					"protocol": "https",
+					"host": [
+						"192",
+						"168",
+						"1",
+						"32"
+					],
+					"port": "8888",
+					"path": [
+						"api",
+						"v1",
+						"roles",
+						"75e01965-95eb-41d5-baaa-19c72f5390a2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update a role /roles/{uniq_id}",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"role_name\": \"role create {{now_unix}}\",\r\n    \"description\": \"desc {{now_unix}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_base}}/roles/886169ef-ead6-49f5-9562-432311fa003f",
+					"host": [
+						"{{server_base}}"
+					],
+					"path": [
+						"roles",
+						"886169ef-ead6-49f5-9562-432311fa003f"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all records /records/",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{server_base}}/records/",
+					"host": [
+						"{{server_base}}"
+					],
+					"path": [
+						"records",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get meta-record by uniq id /records/meta-record/{uniq_id}",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{server_base}}/records/meta-record/3e4164eb-e875-4f07-8c4d-ea3387707cc4",
+					"host": [
+						"{{server_base}}"
+					],
+					"path": [
+						"records",
+						"meta-record",
+						"3e4164eb-e875-4f07-8c4d-ea3387707cc4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get meta-records for user by uniq id /records/meta-records-for-user/{uniq_id}",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{server_base}}/records/meta-records-for-user/79b9218e-fd81-4b3f-8cd1-c2a6bed126b7",
+					"host": [
+						"{{server_base}}"
+					],
+					"path": [
+						"records",
+						"meta-records-for-user",
+						"79b9218e-fd81-4b3f-8cd1-c2a6bed126b7"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post a meta record to DB /records/meta-record",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"owner_uniq_id\": \"79b9218e-fd81-4b3f-8cd1-c2a6bed126b7\",\r\n    \"filename\": \"mp3\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_base}}/records/meta-record",
+					"host": [
+						"{{server_base}}"
+					],
+					"path": [
+						"records",
+						"meta-record"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post full record with data /records/",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file_extension",
+							"value": "mp3",
+							"type": "default"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/euq/Downloads/apache_1288_825.bmp"
+						},
+						{
+							"key": "owner_uniq_id",
+							"value": "79b9218e-fd81-4b3f-8cd1-c2a6bed126b7",
+							"type": "default"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_base}}/records/",
+					"host": [
+						"{{server_base}}"
+					],
+					"path": [
+						"records",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete record with data /records/{uniq_id}",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{server_base}}/records/27093b47-0874-414a-ba75-738a80f0b21a",
+					"host": [
+						"{{server_base}}"
+					],
+					"path": [
+						"records",
+						"27093b47-0874-414a-ba75-738a80f0b21a"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"var moment = require('moment');",
+					"",
+					"pm.collectionVariables.set('now_unix', moment().unix());"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "server_base",
+			"value": "https://192.168.1.32:8888/api/v1",
+			"type": "default"
+		},
+		{
+			"key": "now_unix",
+			"value": "0",
+			"type": "default"
+		}
+	]
+}

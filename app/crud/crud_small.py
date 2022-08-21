@@ -125,6 +125,18 @@ class CRUDRecord(CRUDBase[m_small.RecordDB, s_small.RecordCreate, s_small.Record
         )
 
 
+    def get_records_of_user_by_uniq_id(
+        self, db: Session, *, user_uniq_id: str, skip: int = 0, limit: int = 100
+    ) -> m_small.RecordDB:
+        return (
+            db.query(m_small.RecordDB)
+            .filter(m_small.RecordDB.owner_uniq_id == user_uniq_id)
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+
+
 crud_record = CRUDRecord(m_small.RecordDB)
 
 

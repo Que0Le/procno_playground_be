@@ -197,7 +197,6 @@ class RecordBase(BaseModel):
 class RecordCreate(RecordBase):
     owner_uniq_id: UUID
     filename: str
-    pass
 
 
 # Properties to receive via API on update
@@ -216,8 +215,6 @@ class RecordInDBBase(RecordBase):
 
 
 class RecordGet(RecordInDBBase):
-    uniq_id: UUID
-    filename: str
     created_at: datetime
     updated_at: datetime
 
