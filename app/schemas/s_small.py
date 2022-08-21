@@ -189,22 +189,27 @@ class UserRoleInDBBase(UserRoleBase):
 
 
 class RecordBase(BaseModel):
-    owner_uniq_id: UUID
-    filename: str
+    owner_uniq_id: Optional[UUID]
+    filename: Optional[str]
 
 
 # Properties to receive via API on creation
 class RecordCreate(RecordBase):
+    owner_uniq_id: UUID
+    filename: str
     pass
 
 
 # Properties to receive via API on update
 class RecordUpdate(RecordBase):
-    uniq_id: str
-
+    uniq_id: UUID
+    owner_uniq_id: UUID
+    filename: str
 
 class RecordInDBBase(RecordBase):
-    pass
+    uniq_id: UUID
+    owner_uniq_id: UUID
+    filename: str
 
     class Config:
         orm_mode = True
@@ -212,6 +217,7 @@ class RecordInDBBase(RecordBase):
 
 class RecordGet(RecordInDBBase):
     uniq_id: UUID
+    filename: str
     created_at: datetime
     updated_at: datetime
 

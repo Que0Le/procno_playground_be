@@ -65,6 +65,9 @@ class Settings(BaseSettings):
 
     DATA_PATH: str = "../procno_data"
 
+    APP_DESCRIPTION: str = "Placeholder project description"
+    APP_VERSION: str = "0.0.1"
+
     class Config:
         case_sensitive = True
         env_file = "../procno_data/procno.env"

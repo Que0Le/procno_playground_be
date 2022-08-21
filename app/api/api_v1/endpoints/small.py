@@ -1,6 +1,6 @@
 from genericpath import isfile
 import os
-from typing import Any, List
+from typing import Any, List, Optional
 from datetime import datetime
 import random
 import string
@@ -24,6 +24,10 @@ router_tags = APIRouter()
 router_records = APIRouter()
 
 # TODO: clean input
+
+
+""" ROLES """
+
 
 @router_roles.get("/", response_model=List[s_small.RoleGet])
 def get_all_roles(
@@ -239,16 +243,18 @@ def get_all_records(
 def create_record(
     *,
     db: Session = Depends(deps.get_db),
-    record_in: s_small.RecordCreate,
+    file: UploadFile = File(...), 
+    file_extension: str = Form(...), owner_uniq_id: Optional[str] = Form(...),
     # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
 ) -> Any:
-    # TODO: Check write and uniq_id assigning privilege.
+    """ Create meta data and write to file. Filename holds extension in this request! """
+    # TODO: Check write and uniq_id assigning privillege.
     tries = 10
     filename = ""
     while tries > 0:
         filename = strings.random_alphanumeric(length=32)
         if not os.path.isfile(f"{settings.DATA_PATH}/records/" + filename):
-            record_db = crud_small.crud_record.get_record_by_filename(db=db, record_name=filename)
+            record_db = crud_small.crud_record.get_record_by_filename(db=db, filename=filename)
             if not record_db:
                 break
         tries = tries - 1
@@ -258,12 +264,43 @@ def create_record(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
                 detail=f"Fail create filename"
             )
+    # TODO: check filename extension
+    filename = filename + "." + file_extension
+    # Write to data folder
+    with open(f"{settings.DATA_PATH}/records/{filename}", "wb+") as f:
+        f.write(file.file.read())
+    # Wite to db
+    record_in = s_small.RecordCreate(filename=filename, owner_uniq_id=owner_uniq_id)
+    record_db = crud_small.crud_record.create(db=db, obj_in=record_in)
+    return record_db
 
-    # if record_db:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_400_BAD_REQUEST, 
-    #         detail=f"Record existed: {record_in.filename}"
-    #     )
+
+
+@router_records.post("/meta-record", response_model=s_small.RecordGet)
+def create_record(
+    *,
+    db: Session = Depends(deps.get_db),
+    record_in: s_small.RecordCreate,
+    # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
+) -> Any:
+    """ Only create meta data in DB. Filename holds extension in this request! """
+    # TODO: Check write and uniq_id assigning privillege.
+    tries = 10
+    filename = ""
+    while tries > 0:
+        filename = strings.random_alphanumeric(length=32)
+        if not os.path.isfile(f"{settings.DATA_PATH}/records/" + filename):
+            record_db = crud_small.crud_record.get_record_by_filename(db=db, filename=filename)
+            if not record_db:
+                break
+        tries = tries - 1
+        if tries == 0:
+            print("Failed create filename")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
+                detail=f"Fail create filename"
+            )
+    record_in.filename = filename + "." + record_in.filename
     record_db = crud_small.crud_record.create(db=db, obj_in=record_in)
     return record_db
 
@@ -294,32 +331,34 @@ def create_record(
 #     return record_db
 
 
-# @router_records.delete("/{record_uniq_id}", response_model=s_small.RecordGet)
-# def delete_record_by_uniq_id(
-#     *,
-#     db: Session = Depends(deps.get_db),
-#     record_uniq_id: str,
-#     record_in: s_small.RecordUpdate,
-#     # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
-# ) -> Any:
-#     # if not crud.user.is_superuser(current_user) and (item.owner_id != current_user.id):
-#     #     raise HTTPException(status_code=400, detail="Not enough permissions")
-#     record_db = crud_small.crud_record.get(db=db, uniq_id=record_uniq_id)
-#     if not record_db:
-#         raise HTTPException(status_code=404, detail="Record not found")
-#     record_db = crud_small.crud_record.remove(db=db, uniq_id=record_uniq_id)
-#     return record_db
+@router_records.delete("/{record_uniq_id}", response_model=s_small.RecordGet)
+def delete_record_by_uniq_id(
+    *,
+    db: Session = Depends(deps.get_db),
+    record_uniq_id: str,
+    # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
+) -> Any:
+    # TODO: check permission
+    # if not crud.user.is_superuser(current_user) and (item.owner_id != current_user.id):
+    #     raise HTTPException(status_code=400, detail="Not enough permissions")
+    record_db = crud_small.crud_record.get(db=db, uniq_id=record_uniq_id)
+    if not record_db:
+        raise HTTPException(status_code=404, detail="Record not found")
+
+    record_db = crud_small.crud_record.remove(db=db, uniq_id=record_uniq_id)
+    os.remove(f"{settings.DATA_PATH}/records/{record_db.filename}")
+    return record_db
 
 
-# @router_records.get("/for-user/{user_uniq_id}")
-# def get_all_records_for_user_uniq_id(
-#     *, db: Session = Depends(deps.get_db), user_uniq_id: str
-# ) -> List[s_small.UserRecordGet]:
-#     if not utils.is_valid_uuid(user_uniq_id):
-#         raise HTTPException(
-#             status_code=status.HTTP_400_BAD_REQUEST,
-#             detail=f"Couldn't process UUID : {user_uniq_id}",
-#         )
-#     user_records = crud_small.crud_user_record.get_records_of_user(
-#         db=db, user_uniq_id=user_uniq_id)
-#     return user_records
+@router_records.get("/for-user/{user_uniq_id}")
+def get_all_records_for_user_uniq_id(
+    *, db: Session = Depends(deps.get_db), user_uniq_id: str
+) -> List[s_small.RecordGet]:
+    if not utils.is_valid_uuid(user_uniq_id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Couldn't process UUID : {user_uniq_id}",
+        )
+    user_records = crud_small.crud_record.get_multi(
+        db=db, user_uniq_id=user_uniq_id)
+    return user_records
