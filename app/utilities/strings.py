@@ -1,5 +1,7 @@
 import unicodedata
 import re
+import string, random
+
 
 def slugify(value, allow_unicode=False):
     """
@@ -25,3 +27,7 @@ def clean_string(value, allow_unicode=False):
 def clean_filename(value, allow_unicode=False):
     # TODO: clean the value to produce a valid filename (with extension)
     return value
+
+
+def random_alphanumeric(length: str = 32):
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))

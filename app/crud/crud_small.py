@@ -81,25 +81,6 @@ crud_tag = CRUDTag(m_small.TagDB)
 
 
 class CRUDTagTopic(CRUDBase[m_small.TagTopicDB, s_small.TagTopicCreate, s_small.TagTopicUpdate]):
-    # @staticmethod
-    # def create_tag_topic_relation(
-    #         db: Session, *, topic_uniq_id: str, tag_uniq_id: str
-    # ) -> m_small.TagTopicDB:
-    #     result = db.execute(
-    #         text(queries_tag_topic.INSERT_SINGLE),
-    #         {"topic_uniq_id": topic_uniq_id, "tag_uniq_id": tag_uniq_id}
-    #     )
-    #     db.commit()
-    #     results_as_dict = result.mappings().all()
-    #     tag_topic_db = m_small.TagTopicDB(**results_as_dict[0])
-    #     return tag_topic_db
-
-    # @staticmethod
-    # def remove_by_topic_uniq_id(db: Session, *, topic_uniq_id: str) -> m_small.TagTopicDB:
-    #     obj = db.query(m_small.TagTopicDB).filter(m_small.TagTopicDB.topic_uniq_id == topic_uniq_id).delete()
-    #     # db.delete(obj)
-    #     db.commit()
-    #     return obj
 
     def get_tags_of_topic(
         self, db: Session, *, topic_uniq_id: str, skip: int = 0, limit: int = 100
@@ -134,18 +115,14 @@ crud_tag_topic = CRUDTagTopic(m_small.TagTopicDB)
 
 
 class CRUDRecord(CRUDBase[m_small.RecordDB, s_small.RecordCreate, s_small.RecordUpdate]):
-    @staticmethod
-    def create_record(
-            db: Session, *, filename: str, owner_uniq_id: str
+    def get_record_by_filename(
+        self, db: Session, *, filename: str
     ) -> m_small.RecordDB:
-        result = db.execute(
-            text(queries_record.INSERT_SINGLE),
-            {"filename": filename, "owner_uniq_id": owner_uniq_id}
+        return (
+            db.query(self.model)
+            .filter(m_small.RecordDB.filename == filename)
+            .first()
         )
-        db.commit()
-        results_as_dict = result.mappings().all()
-        record_db = m_small.RecordDB(**results_as_dict[0])
-        return record_db
 
 
 crud_record = CRUDRecord(m_small.RecordDB)

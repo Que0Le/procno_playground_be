@@ -189,7 +189,7 @@ class UserRoleInDBBase(UserRoleBase):
 
 
 class RecordBase(BaseModel):
-    owner_uniq_id: str
+    owner_uniq_id: UUID
     filename: str
 
 
@@ -200,33 +200,28 @@ class RecordCreate(RecordBase):
 
 # Properties to receive via API on update
 class RecordUpdate(RecordBase):
+    uniq_id: str
+
+
+class RecordInDBBase(RecordBase):
     pass
 
-
-""" ReadText """
-
-
-class ReadTextBase(BaseModel):
-    owner_uniq_id: int = None
-    read_text: str = None
+    class Config:
+        orm_mode = True
 
 
-# Properties to receive via API on creation
-class ReadTextCreate(ReadTextBase):
-    pass
-
-
-# Properties to receive via API on update
-class ReadTextUpdate(ReadTextBase):
-    uniq_id: str = None
+class RecordGet(RecordInDBBase):
+    uniq_id: UUID
+    created_at: datetime
+    updated_at: datetime
 
 
 """ Commentar """
 
 
 class CommentarBase(BaseModel):
-    owner_uniq_id: int
-    read_text: str
+    owner_uniq_id: UUID
+    commentar: str
 
 
 # Properties to receive via API on creation
@@ -236,4 +231,48 @@ class CommentarCreate(CommentarBase):
 
 # Properties to receive via API on update
 class CommentarUpdate(CommentarBase):
-    uniq_id: str = None
+    uniq_id: UUID
+
+
+class CommentarInDBBase(CommentarBase):
+    pass
+
+    class Config:
+        orm_mode = True
+
+
+class CommentarGet(CommentarInDBBase):
+    uniq_id: UUID
+    created_at: datetime
+    updated_at: datetime
+
+
+""" ReadText """
+
+
+class ReadTextBase(BaseModel):
+    owner_uniq_id: UUID
+    read_text: str
+
+
+# Properties to receive via API on creation
+class ReadTextCreate(ReadTextBase):
+    pass
+
+
+# Properties to receive via API on update
+class ReadTextUpdate(ReadTextBase):
+    uniq_id: UUID
+
+
+class ReadTextInDBBase(ReadTextBase):
+    pass
+
+    class Config:
+        orm_mode = True
+
+
+class ReadTextGet(ReadTextInDBBase):
+    uniq_id: UUID
+    created_at: datetime
+    updated_at: datetime

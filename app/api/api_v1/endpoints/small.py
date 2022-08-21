@@ -1,3 +1,4 @@
+from genericpath import isfile
 import os
 from typing import Any, List
 from datetime import datetime
@@ -6,6 +7,7 @@ import string
 
 from fastapi import APIRouter, Depends, status, Form, UploadFile, File, HTTPException
 from sqlalchemy.orm import Session
+from app import utilities
 from app.crud import crud_small
 
 from app.models import *
@@ -15,10 +17,11 @@ from app.crud import *
 from app.api import deps
 from app.core.config import settings
 from app.schemas import s_small
-from app.utilities import utils
+from app.utilities import utils, strings, files_and_dir
 
 router_roles = APIRouter()
 router_tags = APIRouter()
+router_records = APIRouter()
 
 # TODO: clean input
 
@@ -208,3 +211,115 @@ def get_all_tags_for_topic_uniq_id(
     tags_topic = crud_small.crud_tag_topic.get_tags_of_topic(
         db=db, topic_uniq_id=topic_uniq_id)
     return tags_topic
+
+
+""" RECORDS """
+
+@router_records.get("/", response_model=List[s_small.RecordGet])
+def get_all_records(
+    db: Session = Depends(deps.get_db),
+) -> Any:
+    records_db = crud_small.crud_record.get_multi(db=db)
+    return records_db
+
+
+@router_records.get("/{record_uniq_id}", response_model=s_small.RecordGet)
+def get_all_records(
+    *,
+    db: Session = Depends(deps.get_db),
+    record_uniq_id: str,
+) -> Any:
+    record_db = crud_small.crud_record.get(db=db, uniq_id=record_uniq_id)
+    if not record_db:
+        raise HTTPException(status_code=404, detail=f"Record not found in db: {record_uniq_id}")
+    return record_db
+
+
+@router_records.post("/", response_model=s_small.RecordGet)
+def create_record(
+    *,
+    db: Session = Depends(deps.get_db),
+    record_in: s_small.RecordCreate,
+    # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
+) -> Any:
+    # TODO: Check write and uniq_id assigning privilege.
+    tries = 10
+    filename = ""
+    while tries > 0:
+        filename = strings.random_alphanumeric(length=32)
+        if not os.path.isfile(f"{settings.DATA_PATH}/records/" + filename):
+            record_db = crud_small.crud_record.get_record_by_filename(db=db, record_name=filename)
+            if not record_db:
+                break
+        tries = tries - 1
+        if tries == 0:
+            print("Failed create filename")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
+                detail=f"Fail create filename"
+            )
+
+    # if record_db:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_400_BAD_REQUEST, 
+    #         detail=f"Record existed: {record_in.filename}"
+    #     )
+    record_db = crud_small.crud_record.create(db=db, obj_in=record_in)
+    return record_db
+
+
+# @router_records.put("/{record_uniq_id}", response_model=s_small.RecordGet)
+# def update_record_by_uniq_id(
+#     *,
+#     db: Session = Depends(deps.get_db),
+#     record_uniq_id: str,
+#     record_in: s_small.RecordUpdate,
+#     # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
+# ) -> Any:
+#     # Check permission
+#     # if not crud.user.is_superuser(current_user) and (item.owner_id != current_user.id):
+#     #     raise HTTPException(status_code=400, detail="Not enough permissions")
+#     record_db = crud_small.crud_record.get(db=db, uniq_id=record_uniq_id)
+#     if not record_db:
+#         raise HTTPException(status_code=404, detail="Record not found")
+#     # Check if there existed a record with same name
+#     record_db_with_same_new_name = crud_small.crud_record.get_record_by_record_name(db=db, record_name=record_in.record_name)
+#     if record_db_with_same_new_name:
+#         if record_db_with_same_new_name.record_name != record_in.record_name:
+#             raise HTTPException(
+#                 status_code=status.HTTP_400_BAD_REQUEST, 
+#                 detail=f"Couldn't change record name: Record name existed: {record_in.record_name}"
+#             )
+#     record_db = crud_small.crud_record.update(db=db, db_obj=record_db, obj_in=record_in)
+#     return record_db
+
+
+# @router_records.delete("/{record_uniq_id}", response_model=s_small.RecordGet)
+# def delete_record_by_uniq_id(
+#     *,
+#     db: Session = Depends(deps.get_db),
+#     record_uniq_id: str,
+#     record_in: s_small.RecordUpdate,
+#     # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
+# ) -> Any:
+#     # if not crud.user.is_superuser(current_user) and (item.owner_id != current_user.id):
+#     #     raise HTTPException(status_code=400, detail="Not enough permissions")
+#     record_db = crud_small.crud_record.get(db=db, uniq_id=record_uniq_id)
+#     if not record_db:
+#         raise HTTPException(status_code=404, detail="Record not found")
+#     record_db = crud_small.crud_record.remove(db=db, uniq_id=record_uniq_id)
+#     return record_db
+
+
+# @router_records.get("/for-user/{user_uniq_id}")
+# def get_all_records_for_user_uniq_id(
+#     *, db: Session = Depends(deps.get_db), user_uniq_id: str
+# ) -> List[s_small.UserRecordGet]:
+#     if not utils.is_valid_uuid(user_uniq_id):
+#         raise HTTPException(
+#             status_code=status.HTTP_400_BAD_REQUEST,
+#             detail=f"Couldn't process UUID : {user_uniq_id}",
+#         )
+#     user_records = crud_small.crud_user_record.get_records_of_user(
+#         db=db, user_uniq_id=user_uniq_id)
+#     return user_records
