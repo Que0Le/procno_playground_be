@@ -15,6 +15,7 @@ from app.api import deps
 from app.core.config import settings
 from app.schemas import s_small
 from app.utilities import utils, strings, files_and_dir
+from app.services import file_helpers
 
 router_roles = APIRouter()
 router_tags = APIRouter()
@@ -246,26 +247,30 @@ def create_record(
 ) -> Any:
     """ Create meta data and write to file. Filename holds extension in this request! """
     # TODO: Check write and uniq_id assigning privillege.
-    tries = 10
-    filename = ""
-    while tries > 0:
-        filename = strings.random_alphanumeric(length=32)
-        if not os.path.isfile(f"{settings.DATA_PATH}/records/" + filename):
-            record_db = crud_small.crud_record.get_record_by_filename(db=db, filename=filename)
-            if not record_db:
-                break
-        tries = tries - 1
-        if tries == 0:
-            print("Failed create filename")
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
-                detail=f"Fail create filename"
-            )
     # TODO: check filename extension
-    filename = filename + "." + file_extension
-    # Write to data folder
-    with open(f"{settings.DATA_PATH}/records/{filename}", "wb+") as f:
-        f.write(file.file.read())
+    filename = file_helpers.write_record_file_to_folder(db=db, file=file, file_extension=file_extension)
+    if filename == "":
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
+            detail=f"Fail create filename"
+        )
+    # while tries > 0:
+    #     filename = strings.random_alphanumeric(length=32)
+    #     if not os.path.isfile(f"{settings.DATA_PATH}/records/" + filename):
+    #         record_db = crud_small.crud_record.get_record_by_filename(db=db, filename=filename)
+    #         if not record_db:
+    #             break
+    #     tries = tries - 1
+    #     if tries == 0:
+    #         print("Failed create filename")
+    #         raise HTTPException(
+    #             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
+    #             detail=f"Fail create filename"
+    #         )
+    # filename = filename + "." + file_extension
+    # # Write to data folder
+    # with open(f"{settings.DATA_PATH}/records/{filename}", "wb+") as f:
+    #     f.write(file.file.read())
     # Wite to db
     record_in = s_small.RecordCreate(filename=filename, owner_uniq_id=owner_uniq_id)
     record_db = crud_small.crud_record.create(db=db, obj_in=record_in)
