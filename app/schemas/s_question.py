@@ -5,25 +5,8 @@ from pydantic import BaseModel, EmailStr
 
 """ Question """
 
-class User(BaseModel):
-    name: str = "1"
 
-    class Config: 
-        orm_mode = True
-
-class Article(BaseModel):
-    text: str = "2"
-    author_id: int = "2"
-
-    class Config:
-        orm_mode = True
-
-class ArticleResponse(BaseModel):
-    article: Article
-    author: User
-
-
-class QuestionBase(BaseModel):
+class QuestionMetaBase(BaseModel):
     topic_uniq_id: Optional[UUID]
     owner_uniq_id: Optional[UUID]
     commentar_uniq_id: Optional[UUID]
@@ -32,7 +15,7 @@ class QuestionBase(BaseModel):
 
 
 # Properties to receive via API on creation
-class QuestionCreate(QuestionBase):
+class QuestionMetaCreate(QuestionMetaBase):
     topic_uniq_id: UUID
     owner_uniq_id: UUID
     commentar_uniq_id: UUID
@@ -41,7 +24,7 @@ class QuestionCreate(QuestionBase):
 
 
 # Properties to receive via API on update
-class QuestionUpdate(QuestionBase):
+class QuestionMetaUpdate(QuestionMetaBase):
     topic_uniq_id: UUID
     owner_uniq_id: UUID
     commentar_uniq_id: UUID
@@ -49,7 +32,7 @@ class QuestionUpdate(QuestionBase):
     read_text_uniq_id: UUID
 
 
-class QuestionInDBBase(QuestionBase):
+class QuestionMetaInDBBase(QuestionMetaBase):
     uniq_id: UUID
     topic_uniq_id: UUID
     owner_uniq_id: UUID
@@ -60,5 +43,15 @@ class QuestionInDBBase(QuestionBase):
         orm_mode = True
 
 
-class QuestionGet(QuestionInDBBase):
+class QuestionMetaGet(QuestionMetaInDBBase):
     pass
+
+from app.schemas import s_small  
+class QuestionCombineGet(BaseModel):
+    question: QuestionMetaGet = None
+    read_text: s_small.ReadTextGet = None
+    record: s_small.RecordGet = None
+    commentar: s_small.CommentarGet = None
+
+
+

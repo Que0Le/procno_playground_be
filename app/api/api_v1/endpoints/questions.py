@@ -12,10 +12,7 @@ from app import utilities
 from app.crud.crud_question import crud_question
 from app.crud.crud_topic import crud_topic
 from app.crud.crud_small import crud_commentar, crud_record, crud_read_text
-from app.models import *
 from app.models import m_user
-from app.schemas import *
-from app.crud import *
 from app.api import deps
 from app.core.config import settings
 from app.schemas import s_question
@@ -25,55 +22,71 @@ from app.utilities import utils, strings, files_and_dir
 router = APIRouter()
 
 
-# @router.get("/test", response_model=s_question.ArticleResponse)
-# def test(
-#     db: Session = Depends(deps.get_db),
-# ) -> Any:
-#     u = s_question.User()
-#     a = s_question.Article()
-#     ar = s_question.ArticleResponse(article=a, author=u)
-#     return s_question.ArticleResponse(article=a, author=u)
-
 """ QUESTIONS """
 
 
-@router.get("/", response_model=List[s_question.QuestionGet])
-def get_all_questions(
+@router.get("/meta", response_model=List[s_question.QuestionMetaGet])
+def get_all_question_metas(
     db: Session = Depends(deps.get_db),
 ) -> Any:
     questions_db = crud_question.get_multi(db=db)
     return questions_db
 
 
-# @router.post("/", response_model=s_question.QuestionGet)
-# def create_question(
-#     *,
-#     db: Session = Depends(deps.get_db),
-#     question_in: s_question.QuestionCreate,
-#     # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
-# ) -> Any:
-#     question_db = crud_question.get_question_by_topic_uniq_id(
-#         db=db, topic_uniq_id=question_in.topic_uniq_id
-#     )
-#     if question_db:
-#         raise HTTPException(
-#             status_code=status.HTTP_400_BAD_REQUEST, 
-#             detail=f"Question existed for topic uniq id: {question_in.topic_uniq_id}"
-#         )
-#     question_db = crud_question.create(db=db, obj_in=question_in)
-#     return question_db
+@router.post("/meta", response_model=s_question.QuestionMetaGet)
+def create_question(
+    *,
+    db: Session = Depends(deps.get_db),
+    question_in: s_question.QuestionMetaCreate,
+    # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
+) -> Any:
+    question_db = crud_question.get_meta_by_topic_uniq_id(
+        db=db, topic_uniq_id=question_in.topic_uniq_id
+    )
+    if question_db:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail=f"Question existed for topic uniq id: {question_in.topic_uniq_id}"
+        )
+    question_db = crud_question.create(db=db, obj_in=question_in)
+    return question_db
 
 
-# @router.get("/{question_uniq_id}", response_model=s_question.QuestionGet)
-# def get_question_by_uniq_id(
-#     *,
-#     db: Session = Depends(deps.get_db),
-#     question_uniq_id: UUID,
-# ) -> Any:
-#     question_db = crud_question.get(db=db, uniq_id=question_uniq_id)
-#     if not question_db:
-#         raise HTTPException(status_code=404, detail=f"Question not found: {question_uniq_id}")
-#     return question_db
+@router.get("/combine/{question_uniq_id}", response_model=s_question.QuestionCombineGet)
+def get_question_combine_by_uniq_id(
+    *,
+    db: Session = Depends(deps.get_db),
+    question_uniq_id: UUID,
+) -> Any:
+    # Question meta
+    question_db = crud_question.get(db=db, uniq_id=question_uniq_id)
+    if not question_db:
+        raise HTTPException(status_code=404, detail=f"Question not found: {question_uniq_id}")
+    # Read text
+    read_text_db = crud_read_text.get(db=db, uniq_id=question_db.read_text_uniq_id)
+    if not read_text_db:
+        raise HTTPException(
+            status_code=404, 
+            detail=f"Read text not found: {question_db.read_text_uniq_id} for question {question_uniq_id}")
+    # Record
+    record_db = crud_record.get(db=db, uniq_id=question_db.record_uniq_id)
+    if not record_db:
+        raise HTTPException(
+            status_code=404, 
+            detail=f"Record not found: {question_db.record_uniq_id} for question {question_uniq_id}")
+    # Commentar
+    commentar_db = crud_commentar.get(db=db, uniq_id=question_db.commentar_uniq_id)
+    if not commentar_db:
+        raise HTTPException(
+            status_code=404, 
+            detail=f"Record not found: {question_db.commentar_uniq_id} for question {question_uniq_id}")
+    
+    return s_question.QuestionCombineGet(
+        commentar=commentar_db,
+        question=question_db,
+        read_text=read_text_db,
+        record=record_db
+    )
 
 
 # @router.delete("/{question_uniq_id}", response_model=s_question.QuestionGet)

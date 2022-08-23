@@ -11,15 +11,17 @@ from app.schemas import s_small, s_topic, s_question
 from app.models import m_small, m_topic, m_answer, m_question
 
 
-class CRUDQuestion(CRUDBase[m_question.QuestionDB, s_question.QuestionCreate, s_question.QuestionUpdate]):
+class CRUDQuestionMeta(
+    CRUDBase[m_question.QuestionMetaDB, s_question.QuestionMetaCreate, s_question.QuestionMetaUpdate]
+):
     
-    def get_question_by_topic_uniq_id(
+    def get_meta_by_topic_uniq_id(
         db: Session, *,
         topic_uniq_id: UUID
-    ) -> m_question.QuestionDB:
+    ) -> m_question.QuestionMetaDB:
         result = (
-            db.query(m_question.QuestionDB)
-            .filter(m_question.QuestionDB.topic_uniq_id == topic_uniq_id)
+            db.query(m_question.QuestionMetaDB)
+            .filter(m_question.QuestionMetaDB.topic_uniq_id == topic_uniq_id)
             .first()
         )
         return result
@@ -56,4 +58,4 @@ class CRUDQuestion(CRUDBase[m_question.QuestionDB, s_question.QuestionCreate, s_
     #     return result
 
 
-crud_question = CRUDQuestion(m_question.QuestionDB)
+crud_question = CRUDQuestionMeta(m_question.QuestionMetaDB)

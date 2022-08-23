@@ -8,7 +8,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.schema import FetchedValue
 
 
-class QuestionDB(Base):
+class QuestionMetaDB(Base):
     # overwrite the table name
     __tablename__ = 'questions'
 
