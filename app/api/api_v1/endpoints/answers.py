@@ -1,3 +1,137 @@
+from genericpath import isfile
+import os
+from typing import Any, List, Optional
+from datetime import datetime
+import random
+import string
+from uuid import UUID
+
+from fastapi import APIRouter, Depends, status, Form, UploadFile, File, HTTPException
+from sqlalchemy.orm import Session
+
+from app import utilities
+from app.crud import crud_small
+from app.crud.crud_answer import crud_answer
+from app.crud.crud_topic import crud_topic
+from app.crud.crud_small import crud_commentar, crud_record
+from app.models import m_user
+from app.api import deps
+from app.core.config import settings
+from app.schemas import s_answer, s_small
+from app.services import file_helpers
+from app.utilities import utils, strings, files_and_dir
+
+
+router = APIRouter()
+
+
+""" ANSWERS """
+
+
+@router.get("/meta", response_model=List[s_answer.AnswerMetaGet])
+def get_all_answer_metas(
+    db: Session = Depends(deps.get_db),
+) -> Any:
+    answer_meta_db = crud_answer.get_multi(db=db)
+    return answer_meta_db
+
+
+@router.post("/meta", response_model=s_answer.AnswerMetaGet)
+def create_answer_meta(
+    *,
+    db: Session = Depends(deps.get_db),
+    answer_in: s_answer.AnswerMetaCreate,
+    # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
+) -> Any:
+    answer_meta_db = crud_answer.get_meta_by_topic_uniq_id(
+        db=db, topic_uniq_id=answer_in.topic_uniq_id
+    )
+    if answer_meta_db:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail=f"Answer existed for topic uniq id: {answer_in.topic_uniq_id}"
+        )
+    answer_meta_db = crud_answer.create(db=db, obj_in=answer_in)
+    return answer_meta_db
+
+
+@router.get("/combine/{answer_uniq_id}", response_model=s_answer.AnswerCombineGet)
+def get_answer_combine_by_uniq_id(
+    *,
+    db: Session = Depends(deps.get_db),
+    answer_uniq_id: UUID,
+) -> Any:
+    # Answer meta
+    answer_meta_db = crud_answer.get(db=db, uniq_id=answer_uniq_id)
+    if not answer_meta_db:
+        raise HTTPException(status_code=404, detail=f"Answer not found: {answer_uniq_id}")
+    # Record
+    record_db = crud_record.get(db=db, uniq_id=answer_meta_db.record_uniq_id)
+    if not record_db:
+        raise HTTPException(
+            status_code=404, 
+            detail=f"Record not found: {answer_meta_db.record_uniq_id} for answer {answer_uniq_id}")
+    # Commentar
+    commentar_db = crud_commentar.get(db=db, uniq_id=answer_meta_db.commentar_uniq_id)
+    if not commentar_db:
+        raise HTTPException(
+            status_code=404, 
+            detail=f"Record not found: {answer_meta_db.commentar_uniq_id} for answer {answer_uniq_id}")
+    
+    return s_answer.AnswerCombineGet(
+        commentar=commentar_db,
+        answer=answer_meta_db,
+        record=record_db
+    )
+
+
+@router.post("/combine", response_model=s_answer.AnswerCombineGet)
+def create_answer_combine(
+    *,
+    db: Session = Depends(deps.get_db),
+    owner_uniq_id: UUID = Form(...),
+    topic_uniq_id: UUID = Form(...),
+    file: UploadFile = File(...), file_extension: str = Form(...),
+    commentar: str = Form(...),
+) -> Any:
+    # Check existing answer for topic
+    answer_meta_db = crud_answer.get_meta_by_topic_uniq_id(
+        db=db, topic_uniq_id=topic_uniq_id
+    )
+    if answer_meta_db:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail=f"Answer existed for topic uniq id: {topic_uniq_id}"
+        )
+    # Create record
+    filename = file_helpers.write_record_file_to_folder(db=db, file=file, file_extension=file_extension)
+    if filename == "":
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
+            detail=f"Fail create filename"
+        )
+    record_db = crud_small.crud_record.create(
+        db=db, obj_in=s_small.RecordCreate(filename=filename, owner_uniq_id=owner_uniq_id)
+    )
+    # Create commentar
+    commentar_db = crud_small.crud_commentar.create(
+        db=db, obj_in=s_small.CommentarCreate(owner_uniq_id=owner_uniq_id, commentar=commentar)
+    )
+    # Answer meta
+    answer_meta_db = crud_answer.create(
+        db=db, obj_in=s_answer.AnswerMetaCreate(
+            topic_uniq_id=topic_uniq_id, owner_uniq_id=owner_uniq_id,
+            commentar_uniq_id=commentar_db.uniq_id,
+            record_uniq_id=record_db.uniq_id,
+        )
+    )
+    return s_answer.AnswerCombineGet(
+        answer=answer_meta_db, commentar=commentar_db, record=record_db
+    )
+
+
+
+""" 
 import os
 from typing import Any, List
 from datetime import datetime
@@ -26,9 +160,7 @@ def get_own_answers(
     db: Session = Depends(deps.get_db),
     current_user: m_user.UserDB = Depends(deps.get_current_user),
 ) -> Any:
-    """
-    Get topic overviews created by current user
-    """
+
     return {}
 
 
@@ -53,8 +185,6 @@ async def create_new_answer(
         for _ in range(settings.RECORD_FILENAME_LENGTH)
     ) + '.webm'
 
-    """ Write new answer to DB """
-
     # Add record
     record_db = crud_small.crud_record.create_record(
         db=db,
@@ -66,7 +196,7 @@ async def create_new_answer(
         commentar_from_user=commentar, owner_uniq_id=current_user.uniq_id
     )
 
-    # Add question and relation with topic
+    # Add answer and relation with topic
     answer_db = crud_answer.crud_answer.create_answer(
         db=db,
         owner_uniq_id=current_user.uniq_id, commentar_uniq_id=commentar_db.uniq_id,
@@ -77,11 +207,9 @@ async def create_new_answer(
         topic_uniq_id=topic_uniq_id, answer_uniq_id=answer_db.uniq_id
     )
 
-    """ Write file """
     with open(f"./data/records/{filename}", "wb+") as f:
         f.write(file.file.read())
 
-    """ Now try retrieve the combi for recently added answer """
     answer_combi_db = crud_answer.crud_answer.get_combi_by_uniq_id(db=db, answer_uniq_id=answer_db.uniq_id)
 
     return {
@@ -150,9 +278,7 @@ def get_topic_overview_by_uniq_id(
     db: Session = Depends(deps.get_db),
     topic_uniq_id: str
 ) -> Any:
-    """
-    Get a topic by its uniq_id
-    """
+
     answers_db = crud_answer.crud_answer.get_combi_by_topic_uniq_id(db=db, topic_uniq_id=topic_uniq_id)
     answers_get = []
     for answer_db in answers_db:
@@ -160,3 +286,4 @@ def get_topic_overview_by_uniq_id(
         if temp:
             answers_get.append(temp)
     return answers_get
+"""

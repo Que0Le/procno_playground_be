@@ -34,3 +34,8 @@ BIG TODO:
 select owner_uniq_id, count(id) counted from topics group by topics.owner_uniq_id order by counted desc 
 
 ```
+
+```bash
+# Use text to speech for testing
+sudo apt install ffmpeg espeak
+```

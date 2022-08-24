@@ -264,13 +264,12 @@ class ReadTextBase(BaseModel):
 
 # Properties to receive via API on creation
 class ReadTextCreate(ReadTextBase):
-    pass
+    owner_uniq_id: UUID
+    read_text: str
 
 
 # Properties to receive via API on update
 class ReadTextUpdate(ReadTextBase):
-    uniq_id: UUID
-    owner_uniq_id: UUID
     read_text: str
 
 

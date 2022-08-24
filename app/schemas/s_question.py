@@ -2,6 +2,8 @@ from typing import Optional
 from uuid import UUID
 from pydantic import BaseModel, EmailStr
 
+from app.schemas import s_small  
+
 
 """ Question """
 
@@ -39,6 +41,7 @@ class QuestionMetaInDBBase(QuestionMetaBase):
     commentar_uniq_id: UUID
     record_uniq_id: UUID
     read_text_uniq_id: UUID
+
     class Config:
         orm_mode = True
 
@@ -46,7 +49,7 @@ class QuestionMetaInDBBase(QuestionMetaBase):
 class QuestionMetaGet(QuestionMetaInDBBase):
     pass
 
-from app.schemas import s_small  
+
 class QuestionCombineGet(BaseModel):
     question: QuestionMetaGet = None
     read_text: s_small.ReadTextGet = None
