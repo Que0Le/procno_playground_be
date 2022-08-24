@@ -7,3 +7,4 @@ app.egg-info
 test.py
 data/
 testing.py
+.pytest_cache/

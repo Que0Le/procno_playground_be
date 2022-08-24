@@ -12,7 +12,7 @@ from app.models.m_question import QuestionMetaDB
 from app.api import deps
 
 
-class CRUDQuestionMeta(CRUDBase[QuestionMetaDB, QuestionMetaCreate, QuestionMetaUpdate]):
+class CRUDQuestion(CRUDBase[QuestionMetaDB, QuestionMetaCreate, QuestionMetaUpdate]):
     def get_meta_by_topic_uniq_id(
         self, db: Session, *, topic_uniq_id: UUID
     ) -> QuestionMetaDB:
@@ -24,4 +24,4 @@ class CRUDQuestionMeta(CRUDBase[QuestionMetaDB, QuestionMetaCreate, QuestionMeta
         return result
 
 
-crud_question = CRUDQuestionMeta(QuestionMetaDB)
+crud_question = CRUDQuestion(QuestionMetaDB)

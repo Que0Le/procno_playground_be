@@ -43,14 +43,6 @@ def create_answer_meta(
     answer_in: s_answer.AnswerMetaCreate,
     # current_user: m_user.UserDB = Depends(deps.get_current_active_user),
 ) -> Any:
-    answer_meta_db = crud_answer.get_meta_by_topic_uniq_id(
-        db=db, topic_uniq_id=answer_in.topic_uniq_id
-    )
-    if answer_meta_db:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, 
-            detail=f"Answer existed for topic uniq id: {answer_in.topic_uniq_id}"
-        )
     answer_meta_db = crud_answer.create(db=db, obj_in=answer_in)
     return answer_meta_db
 
@@ -94,15 +86,6 @@ def create_answer_combine(
     file: UploadFile = File(...), file_extension: str = Form(...),
     commentar: str = Form(...),
 ) -> Any:
-    # Check existing answer for topic
-    answer_meta_db = crud_answer.get_meta_by_topic_uniq_id(
-        db=db, topic_uniq_id=topic_uniq_id
-    )
-    if answer_meta_db:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, 
-            detail=f"Answer existed for topic uniq id: {topic_uniq_id}"
-        )
     # Create record
     filename = file_helpers.write_record_file_to_folder(db=db, file=file, file_extension=file_extension)
     if filename == "":
