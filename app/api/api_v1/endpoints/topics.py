@@ -10,7 +10,8 @@ from fastapi import APIRouter, Depends, status, Form, UploadFile, File, HTTPExce
 from sqlalchemy.orm import Session
 
 from app import utilities
-from app.crud import crud_question, crud_small
+from app.crud.crud_question import crud_question
+from app.crud import crud_small
 from app.crud.crud_topic import crud_topic
 from app.crud.crud_small import crud_commentar, crud_record, crud_read_text
 from app.models import m_user
@@ -46,41 +47,54 @@ def create_topic_meta(
     return topic_meta_db
 
 
-# @router.get("/combine/{topic_uniq_id}", response_model=s_topic.TopicCombineGet)
-# def get_topic_combine_by_uniq_id(
-#     *,
-#     db: Session = Depends(deps.get_db),
-#     topic_uniq_id: UUID,
-# ) -> Any:
-#     # Topic meta
-#     topic_meta_db = crud_topic.get(db=db, uniq_id=topic_uniq_id)
-#     if not topic_meta_db:
-#         raise HTTPException(status_code=404, detail=f"Topic not found: {topic_uniq_id}")
-#     # Read text
-#     read_text_db = crud_read_text.get(db=db, uniq_id=topic_meta_db.read_text_uniq_id)
-#     if not read_text_db:
-#         raise HTTPException(
-#             status_code=404, 
-#             detail=f"Read text not found: {topic_meta_db.read_text_uniq_id} for topic {topic_uniq_id}")
-#     # Record
-#     record_db = crud_record.get(db=db, uniq_id=topic_meta_db.record_uniq_id)
-#     if not record_db:
-#         raise HTTPException(
-#             status_code=404, 
-#             detail=f"Record not found: {topic_meta_db.record_uniq_id} for topic {topic_uniq_id}")
-#     # Commentar
-#     commentar_db = crud_commentar.get(db=db, uniq_id=topic_meta_db.commentar_uniq_id)
-#     if not commentar_db:
-#         raise HTTPException(
-#             status_code=404, 
-#             detail=f"Record not found: {topic_meta_db.commentar_uniq_id} for topic {topic_uniq_id}")
-    
-#     return s_topic.TopicCombineGet(
-#         commentar=commentar_db,
-#         topic=topic_meta_db,
-#         read_text=read_text_db,
-#         record=record_db
-#     )
+@router.get("/combine/{topic_uniq_id}", response_model=s_topic.TopicCombineGet)
+def get_topic_combine_by_uniq_id(
+    *,
+    db: Session = Depends(deps.get_db),
+    topic_uniq_id: UUID,
+) -> Any:
+    # Topic meta
+    topic_meta_db = crud_topic.get(db=db, uniq_id=topic_uniq_id)
+    if not topic_meta_db:
+        raise HTTPException(status_code=404, detail=f"Topic not found: {topic_uniq_id}")
+    # Question meta
+    question_meta_db = crud_question.get_meta_by_topic_uniq_id(
+        db=db, topic_uniq_id=topic_meta_db.uniq_id)
+    if not question_meta_db:
+        raise HTTPException(
+            status_code=404, detail=f"Question not found for topic: {topic_meta_db.uniq_id}")
+    # Read text
+    read_text_db = crud_read_text.get(db=db, uniq_id=question_meta_db.read_text_uniq_id)
+    if not read_text_db:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Read text not found: {question_meta_db.read_text_uniq_id} for question {question_meta_db.question_uniq_id}")
+    # Record
+    record_db = crud_record.get(db=db, uniq_id=question_meta_db.record_uniq_id)
+    if not record_db:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Record not found: {question_meta_db.record_uniq_id} for question {question_meta_db.question_uniq_id}")
+    # Commentar
+    commentar_db = crud_commentar.get(db=db, uniq_id=question_meta_db.commentar_uniq_id)
+    if not commentar_db:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Record not found: {question_meta_db.commentar_uniq_id} for question {question_meta_db.question_uniq_id}")
+    # Tags
+    tags_db = crud_small.crud_tag_topic.get_tags_of_topic(
+        db=db, topic_uniq_id=topic_meta_db.uniq_id)
+
+    return s_topic.TopicCombineGet(
+        topic_meta=topic_meta_db,
+        question_combine=s_question.QuestionCombineGet(
+            commentar=commentar_db,
+            question=question_meta_db,
+            read_text=read_text_db,
+            record=record_db
+        ),
+        tags=tags_db
+    )
 
 
 @router.post("/combine", response_model=s_topic.TopicCombineGet)
@@ -88,65 +102,88 @@ def create_topic_combine(
     *,
     db: Session = Depends(deps.get_db),
     owner_uniq_id: UUID = Form(...),
-    title : str = Form(...),
-    source_language : str = Form(...),
-    source_level : str = Form(...),
-    wish_correct_languages : str = Form(...), # need to verify and convert by hand
+    title: str = Form(...),
+    source_language: str = Form(...),
+    source_level: str = Form(...),
+    wish_correct_languages: str = Form(...),  # need to verify and convert by hand
     file: UploadFile = File(...), file_extension: str = Form(...),
     read_text: str = Form(...),
     commentar: str = Form(...),
+    tags: str = Form(...),  # need to verify and convert by hand
 ) -> Any:
-    # TODO: string clean
-    wish_correct_languages = wish_correct_languages.split(",")
+    # TODO: string clean for tags and wish_lang
     # Create record
-    filename = file_helpers.write_record_file_to_folder(db=db, file=file, file_extension=file_extension)
+    filename = file_helpers.write_record_file_to_folder(
+        db=db, file=file, file_extension=file_extension)
     if filename == "":
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Fail create filename"
         )
     record_db = crud_small.crud_record.create(
-        db=db, obj_in=s_small.RecordCreate(filename=filename, owner_uniq_id=owner_uniq_id)
+        db=db, obj_in=s_small.RecordCreate(
+            filename=filename, owner_uniq_id=owner_uniq_id)
     )
     # Create commentar
     commentar_db = crud_small.crud_commentar.create(
-        db=db, obj_in=s_small.CommentarCreate(owner_uniq_id=owner_uniq_id, commentar=commentar)
+        db=db, obj_in=s_small.CommentarCreate(
+            owner_uniq_id=owner_uniq_id, commentar=commentar)
     )
     # Crate read text
     read_text_db = crud_small.crud_read_text.create(
-        db=db, obj_in=s_small.ReadTextCreate(owner_uniq_id=owner_uniq_id, read_text=read_text)
+        db=db, obj_in=s_small.ReadTextCreate(
+            owner_uniq_id=owner_uniq_id, read_text=read_text)
     )
-    # Create tags
-
     # Create topic meta
+    wish_correct_languages = [x.strip() for x in wish_correct_languages.split(',')]
     topic_meta_db = crud_topic.create(
-            db=db, obj_in=s_topic.TopicMetaCreate(
+        db=db,
+        obj_in=s_topic.TopicMetaCreate(
             owner_uniq_id=owner_uniq_id,
             title=title,
             source_language=source_language,
             source_level=source_level,
             wish_correct_languages=wish_correct_languages,
-            commentar_uniq_id=commentar_db.uniq_id,
-            read_text_uniq_id=read_text_db.uniq_id,
-            record_uniq_id=record_db.uniq_id,
         )
     )
     # Create question meta
     question_meta_db = crud_question.create(
         db=db, obj_in=s_question.QuestionMetaCreate(
-            topic_uniq_id=topic_meta_db.uniq_id, 
+            topic_uniq_id=topic_meta_db.uniq_id,
             owner_uniq_id=owner_uniq_id,
             commentar_uniq_id=commentar_db.uniq_id,
             read_text_uniq_id=read_text_db.uniq_id,
             record_uniq_id=record_db.uniq_id,
         )
     )
+    # Create tags
+    tags = [x.strip() for x in tags.split(',')]
+    tags_db = []
+    for tag in tags:
+        tag_db = crud_small.crud_tag.get_tag_by_tag_name(db=db, tag_name=tag)
+        tab_topic_db = None
+        if not tag_db:
+            tag_db = crud_small.crud_tag.create(
+                db=db, obj_in=s_small.TagCreate(tag_name=tag, description=""))
+        if tag_db:
+            tab_topic_db = crud_small.crud_tag_topic.create(
+                db=db,
+                obj_in=s_small.TagTopicCreate(
+                    topic_uniq_id=topic_meta_db.uniq_id, tag_uniq_id=tag_db.uniq_id
+                )
+            )
+        if tag_db and tab_topic_db:
+            tags_db.append(tag_db)
     return s_topic.TopicCombineGet(
-        answers_combine=None,
-        question_combine=quest,
-        tags=
+        topic_meta=topic_meta_db,
+        question_combine=s_question.QuestionCombineGet(
+            commentar=commentar_db,
+            question=question_meta_db,
+            read_text=read_text_db,
+            record=record_db
+        ),
+        tags=tags_db
     )
-
 
 
 # import os

@@ -13,7 +13,6 @@ class TopicMetaBase(BaseModel):
     title: Optional[str]
     source_language: Optional[str]
     source_level: Optional[str]
-    wish_correct_languages: List[str]
 
 
 # Properties to receive via API on creation
@@ -24,7 +23,6 @@ class TopicMetaCreate(TopicMetaBase):
     source_level: str
     wish_correct_languages: List[str]
 
-
 # Properties to receive via API on update
 class TopicMetaUpdate(TopicMetaBase):
     owner_uniq_id: UUID
@@ -32,7 +30,7 @@ class TopicMetaUpdate(TopicMetaBase):
     source_language: str
     source_level: str
     wish_correct_languages: List[str]
-
+    # TODO: tags
 
 class TopicMetaInDBBase(TopicMetaBase):
     uniq_id: UUID
@@ -51,10 +49,9 @@ class TopicMetaGet(TopicMetaInDBBase):
 
 
 class TopicCombineGet(BaseModel):
-    topic_meta: TopicMetaGet = None
-    question_combine: s_question.QuestionCombineGet = None
-    answers_combine: List[s_answer.AnswerCombineGet] = None
-    tags: List[s_small.TagGet] = None
+    topic_meta: TopicMetaGet
+    question_combine: s_question.QuestionCombineGet
+    tags: List[s_small.TagGet]
 
 
 

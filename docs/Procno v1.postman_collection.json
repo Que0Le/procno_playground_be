@@ -42,7 +42,53 @@
 			"response": []
 		},
 		{
+			"name": "Get all roles of user by uniq id /roles/for-user/{uniq_id}",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{server_base}}/roles/for-user/79b9218e-fd81-4b3f-8cd1-c2a6bed126b7",
+					"host": [
+						"{{server_base}}"
+					],
+					"path": [
+						"roles",
+						"for-user",
+						"79b9218e-fd81-4b3f-8cd1-c2a6bed126b7"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Post a role /roles/",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"role_name\": \"role create 1234\",\r\n    \"description\": \"desc 3\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_base}}/roles/",
+					"host": [
+						"{{server_base}}"
+					],
+					"path": [
+						"roles",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post a read text /read-texts/",
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -222,13 +268,13 @@
 					"formdata": [
 						{
 							"key": "file_extension",
-							"value": "mp3",
+							"value": "m4a",
 							"type": "default"
 						},
 						{
 							"key": "file",
 							"type": "file",
-							"src": "/C:/Users/euq/Downloads/apache_1288_825.bmp"
+							"src": "/C:/Users/euq/Downloads/Recording.m4a"
 						},
 						{
 							"key": "owner_uniq_id",
@@ -268,6 +314,297 @@
 					"path": [
 						"records",
 						"27093b47-0874-414a-ba75-738a80f0b21a"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post full question with data /questions/combine",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file_extension",
+							"value": "mp3",
+							"type": "default"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/euq/Downloads/test.mp3"
+						},
+						{
+							"key": "owner_uniq_id",
+							"value": "79b9218e-fd81-4b3f-8cd1-c2a6bed126b7",
+							"type": "default"
+						},
+						{
+							"key": "topic_uniq_id",
+							"value": "a84d7d92-dc01-4a54-b0fe-45f737b6fcab",
+							"type": "default"
+						},
+						{
+							"key": "read_text",
+							"value": "read text test",
+							"type": "default"
+						},
+						{
+							"key": "commentar",
+							"value": "hehe",
+							"type": "default"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_base}}/questions/combine",
+					"host": [
+						"{{server_base}}"
+					],
+					"path": [
+						"questions",
+						"combine"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post full answer with data /answer/combine",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file_extension",
+							"value": "mp3",
+							"type": "default"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/euq/Downloads/test.mp3"
+						},
+						{
+							"key": "owner_uniq_id",
+							"value": "79b9218e-fd81-4b3f-8cd1-c2a6bed126b7",
+							"type": "default"
+						},
+						{
+							"key": "topic_uniq_id",
+							"value": "a84d7d92-dc01-4a54-b0fe-45f737b6fcab",
+							"type": "default"
+						},
+						{
+							"key": "commentar",
+							"value": "hehe",
+							"type": "default"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_base}}/answers/combine",
+					"host": [
+						"{{server_base}}"
+					],
+					"path": [
+						"answers",
+						"combine"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post full topic with data /topics/combine",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "owner_uniq_id",
+							"value": "79b9218e-fd81-4b3f-8cd1-c2a6bed126b7",
+							"type": "default"
+						},
+						{
+							"key": "title",
+							"value": "title {{now_unix}}",
+							"type": "default"
+						},
+						{
+							"key": "source_language",
+							"value": "eng",
+							"type": "default"
+						},
+						{
+							"key": "source_level",
+							"value": "s1",
+							"type": "default"
+						},
+						{
+							"key": "wish_correct_languages",
+							"value": "d, e",
+							"type": "default"
+						},
+						{
+							"key": "file_extension",
+							"value": "mp3",
+							"type": "default"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/euq/Downloads/test.mp3"
+						},
+						{
+							"key": "topic_uniq_id",
+							"value": "a84d7d92-dc01-4a54-b0fe-45f737b6fcab",
+							"type": "default"
+						},
+						{
+							"key": "commentar",
+							"value": "hehe",
+							"type": "default"
+						},
+						{
+							"key": "read_text",
+							"value": "read text {{now_unix}}",
+							"type": "default"
+						},
+						{
+							"key": "commentar",
+							"value": "commentar {{now_unix}}",
+							"type": "default"
+						},
+						{
+							"key": "tags",
+							"value": "t1 {{now_unix}}, t2 {{now_unix}}",
+							"type": "default"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_base}}/topics/combine",
+					"host": [
+						"{{server_base}}"
+					],
+					"path": [
+						"topics",
+						"combine"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get full topic combine /topics/combine{uniq_id}",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "owner_uniq_id",
+							"value": "79b9218e-fd81-4b3f-8cd1-c2a6bed126b7",
+							"type": "default"
+						},
+						{
+							"key": "title",
+							"value": "title {{now_unix}}",
+							"type": "default"
+						},
+						{
+							"key": "source_language",
+							"value": "eng",
+							"type": "default"
+						},
+						{
+							"key": "source_level",
+							"value": "s1",
+							"type": "default"
+						},
+						{
+							"key": "wish_correct_languages",
+							"value": "d, e",
+							"type": "default"
+						},
+						{
+							"key": "file_extension",
+							"value": "mp3",
+							"type": "default"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/euq/Downloads/test.mp3"
+						},
+						{
+							"key": "topic_uniq_id",
+							"value": "a84d7d92-dc01-4a54-b0fe-45f737b6fcab",
+							"type": "default"
+						},
+						{
+							"key": "commentar",
+							"value": "hehe",
+							"type": "default"
+						},
+						{
+							"key": "read_text",
+							"value": "read text {{now_unix}}",
+							"type": "default"
+						},
+						{
+							"key": "commentar",
+							"value": "commentar {{now_unix}}",
+							"type": "default"
+						},
+						{
+							"key": "tags",
+							"value": "t1 {{now_unix}}, t2 {{now_unix}}",
+							"type": "default"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_base}}/topics/combine/a1d3512e-0c68-447d-80ef-05c9721b5b0e",
+					"host": [
+						"{{server_base}}"
+					],
+					"path": [
+						"topics",
+						"combine",
+						"a1d3512e-0c68-447d-80ef-05c9721b5b0e"
 					]
 				}
 			},

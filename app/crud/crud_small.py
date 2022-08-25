@@ -71,8 +71,8 @@ class CRUDTagTopic(CRUDBase[m_small.TagTopicDB, s_small.TagTopicCreate, s_small.
     ) -> List[m_small.TagDB]:
         return (
             db.query(m_small.TagDB)
-            .filter(m_topic.TopicDB.uniq_id == topic_uniq_id)
-            .filter(m_topic.TopicDB.uniq_id == m_small.TagTopicDB.topic_uniq_id)
+            .filter(m_topic.TopicMetaDB.uniq_id == topic_uniq_id)
+            .filter(m_topic.TopicMetaDB.uniq_id == m_small.TagTopicDB.topic_uniq_id)
             .filter(m_small.TagDB.uniq_id == m_small.TagTopicDB.tag_uniq_id)
             .offset(skip)
             .limit(limit)

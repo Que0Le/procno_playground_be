@@ -8,44 +8,49 @@ from uuid import UUID
 
 
 class TagBase(BaseModel):
-    tag_name: str = None
-    description: str = None
+    tag_name: Optional[str]
+    description: Optional[str]
 
 
 # Properties to receive via API on creation
 class TagCreate(TagBase):
-    pass
+    tag_name: str
+    description: str
 
 
 # Properties to receive via API on update
 class TagUpdate(TagBase):
-    uniq_id: str = None
+    tag_name: str
+    description: str
 
 
 class TagInDBBase(TagBase):
-    pass
+    uniq_id: UUID
+    tag_name: str
+    description: str
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         orm_mode = True
 
 
 class TagGet(TagInDBBase):
-    uniq_id: UUID
-    created_at: datetime
-    updated_at: datetime
+    pass
 
 class TagTopicBase(BaseModel):
-    topic_uniq_id: str = None
-    tag_uniq_id: str = None
+    topic_uniq_id: Optional[UUID]
+    tag_uniq_id: Optional[UUID]
 
 
 # Properties to receive via API on creation
-class TagTopicCreate(TagBase):
-    pass
+class TagTopicCreate(TagTopicBase):
+    topic_uniq_id: UUID
+    tag_uniq_id: UUID
 
 
 # Properties to receive via API on update
-class TagTopicUpdate(TagBase):
+class TagTopicUpdate(TagTopicBase):
     pass
 
 class TagTopicGet():
